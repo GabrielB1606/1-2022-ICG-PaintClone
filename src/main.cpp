@@ -11,7 +11,15 @@ static int WIDTH = 1280;
 static int HEIGHT = 720;
 static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-void display_function(void)
+void display_imgui_function(){
+    ImGui::Begin("Hello World");
+        ImGui::Text("qlqlq");
+        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+            printf("qlqlq");
+    ImGui::End();
+}
+
+void display_function_glut(void)
 {
     // glClearColor(1, 1, 1, 1);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -31,7 +39,8 @@ void imgui_glut_display_function(){
     ImGui_ImplOpenGL2_NewFrame();
     ImGui_ImplGLUT_NewFrame();
 
-    
+    display_imgui_function();
+
     // Rendering
     ImGui::Render();
     ImGuiIO& io = ImGui::GetIO();
@@ -39,7 +48,7 @@ void imgui_glut_display_function(){
     glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    display_function();
+    display_function_glut();
     
     //glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context where shaders may be bound, but prefer using the GL3+ code.
     ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
@@ -52,7 +61,7 @@ int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_MULTISAMPLE);
-    glutInitWindowSize(1280, 720);
+    glutInitWindowSize(WIDTH, HEIGHT);
     glutCreateWindow("Hello World");
  
 	glViewport(0, 0, WIDTH, HEIGHT);	
