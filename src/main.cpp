@@ -9,13 +9,86 @@
 // Variable Globales
 static int WIDTH = 1280;
 static int HEIGHT = 720;
-static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+static ImVec4 background_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+
+static ImVec4 fill_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+static ImVec4 border_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+
+static bool hardware_mode = true;
+static bool center_mode = false;
+
+enum EnumDrawShape{
+    DrawLine,
+    DrawCircle,
+    DrawEllipse,
+    DrawRectangle,
+    DrawTriangle,
+    DrawBezier
+};
+
+static int current_shape = 1;
+const char* shapes[] = { 
+    "Line",
+    "Circle",
+    "Ellipse",
+    "Rectangle",
+    "Triangle",
+    "Bezier Curve"
+};
+
+
+
+static void HelpMarker(const char* desc)
+{
+    ImGui::TextDisabled("(?)");
+    if (ImGui::IsItemHovered())
+    {
+        ImGui::BeginTooltip();
+        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+        ImGui::TextUnformatted(desc);
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
+}
 
 void display_imgui_function(){
+
     ImGui::Begin("Hello World");
-        ImGui::Text("qlqlq");
-        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-            printf("qlqlq");
+        ImVec2 size = ImGui::GetItemRectSize();
+
+        ImGui::Text("Background Color");
+        ImGui::ColorEdit3(" ", (float*)&background_color); // Edit 3 floats representing a color
+
+        ImGui::Checkbox("Hardware Mode", &hardware_mode);
+
+        ImGui::Separator();
+        ImGui::Text("Draw");
+
+        switch (current_shape)
+        {
+        case DrawEllipse:
+        case DrawCircle:
+            ImGui::Checkbox("Center Mode", &center_mode);
+            ImGui::SameLine();
+            HelpMarker("The first point given will be taken as the center.\n\n(Drag while pressing Alt)");
+            break;
+        
+        default:
+            break;
+        }
+
+        ImGui::Text("Shape");
+        ImGui::SameLine();
+        HelpMarker("Ayuda");
+        
+        ImGui::ListBox(" ", &current_shape, shapes, IM_ARRAYSIZE(shapes), 6);
+
+        ImGui::Text("Colors");
+        ImGui::ColorEdit3("Fill", (float*)&fill_color); // Edit 3 floats representing a color
+        ImGui::ColorEdit3("Border", (float*)&border_color); // Edit 3 floats representing a color
+        
+        
     ImGui::End();
 }
 
@@ -26,8 +99,10 @@ void display_function_glut(void)
     glBegin(GL_TRIANGLES);
         glColor3f(1,0,0);
         glVertex3f(100, 100, 0);
+        
         glColor3f(0,1,0);
         glVertex3f( 200, 100, 0);
+        
         glColor3f(0,0,1);
         glVertex3f( 150,  200, 0);
     glEnd();
@@ -45,8 +120,11 @@ void imgui_glut_display_function(){
     ImGui::Render();
     ImGuiIO& io = ImGui::GetIO();
     glViewport(0, 0, (GLsizei)io.DisplaySize.x, (GLsizei)io.DisplaySize.y);
-    glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+    
+    glClearColor(background_color.x * background_color.w, background_color.y * background_color.w, background_color.z * background_color.w, background_color.w);
+    
     glClear(GL_COLOR_BUFFER_BIT);
+
 
     display_function_glut();
     
