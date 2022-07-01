@@ -17,6 +17,7 @@ static ImVec4 border_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
 
 static bool hardware_mode = true;
 static bool center_mode = false;
+static bool vertice_mode = false;
 
 enum EnumDrawShape{
     DrawLine,
@@ -36,8 +37,6 @@ const char* shapes[] = {
     "Triangle",
     "Bezier Curve"
 };
-
-
 
 static void HelpMarker(const char* desc)
 {
@@ -72,6 +71,11 @@ void display_imgui_function(){
             ImGui::Checkbox("Center Mode", &center_mode);
             ImGui::SameLine();
             HelpMarker("The first point given will be taken as the center.\n\n(Drag while pressing Alt)");
+            break;
+        case DrawTriangle:
+            ImGui::Checkbox("Vertice Mode", &vertice_mode);
+            ImGui::SameLine();
+            HelpMarker("Click three times to define the position of each vertex.");
             break;
         
         default:

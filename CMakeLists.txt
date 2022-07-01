@@ -5,10 +5,19 @@ set(CMAKE_SUPPRESS_REGENERATION true)
 
 add_compile_definitions(FREEGLUT_STATIC)
 
-add_executable(Paint src/main.cpp src/imgui/imgui.cpp src/imgui/imgui_impl_glut.cpp src/imgui/imgui_impl_opengl2.cpp src/imgui/imgui_demo.cpp src/imgui/imgui_draw.cpp src/imgui/imgui_tables.cpp src/imgui/imgui_widgets.cpp)
+# all imgui .cpp files
+file( GLOB IMGUI_SRC src/imgui/*.cpp )
+
+add_executable(${PROJECT_NAME} src/main.cpp ${IMGUI_SRC})
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 
 target_include_directories( ${PROJECT_NAME} PUBLIC include/ include/imgui )
 target_link_directories( ${PROJECT_NAME} PRIVATE lib/ )
 target_link_libraries(${PROJECT_NAME} freeglut_staticd)
+
+# imgui demo
+add_executable(imgui_demo src/imgui_main.cpp ${IMGUI_SRC})
+target_include_directories( imgui_demo PUBLIC include/ include/imgui )
+target_link_directories( imgui_demo PRIVATE lib/ )
+target_link_libraries(imgui_demo freeglut_staticd)
