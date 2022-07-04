@@ -1,16 +1,7 @@
-#pragma once
+#ifndef IMGUI_PAINT_H
+#define IMGUI_PAINT_H
 
 #include "GlutPaint.h"
-
-static int current_shape = 1;
-const char* shapes[] = { 
-    "Line",
-    "Circle",
-    "Ellipse",
-    "Rectangle",
-    "Triangle",
-    "Bezier Curve"
-};
 
 void ImGuiPaintInit(){
     // Setup Dear ImGui context
@@ -29,6 +20,12 @@ void ImGuiPaintInit(){
     ImGui_ImplGLUT_InstallFuncs();
     ImGui_ImplOpenGL2_Init();
 }
+
+void ImGuiPaintMotionFunc(int x, int y){
+    ImGuiIO& io = ImGui::GetIO();
+    io.AddMousePosEvent((float)x, (float)y);
+}
+
 
 static void HelpMarker(const char* desc)
 {
@@ -65,12 +62,12 @@ void ImGuiPaintDisplay(){
         {
         case DrawEllipse:
         case DrawCircle:
-            ImGui::Checkbox("Center Mode", &center_mode);
+            ImGui::Checkbox("Center Mode", &alt_drawing_mode);
             ImGui::SameLine();
             HelpMarker("The first point given will be taken as the center.\n\n(Drag while pressing Alt)");
             break;
         case DrawTriangle:
-            ImGui::Checkbox("Vertice Mode", &vertice_mode);
+            ImGui::Checkbox("Vertice Mode", &alt_drawing_mode);
             ImGui::SameLine();
             HelpMarker("Click three times to define the position of each vertex.");
             break;
@@ -82,7 +79,14 @@ void ImGuiPaintDisplay(){
         ImGui::Text("Shape");
         ImGui::SameLine();
         HelpMarker("Ayuda");
-        
+        const char* shapes[] = { 
+            "Line",
+            "Circle",
+            "Ellipse",
+            "Rectangle",
+            "Triangle",
+            "Bezier Curve"
+        };
         ImGui::ListBox(" ", &current_shape, shapes, IM_ARRAYSIZE(shapes), 6);
 
         ImGui::Text("Colors");
@@ -95,3 +99,5 @@ void ImGuiPaintDisplay(){
     ImGui::Render();
 
 }
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ENUM_DRAW_SHAPE_H
+#define ENUM_DRAW_SHAPE_H
 
 enum EnumDrawShape{
     DrawLine,
@@ -8,3 +9,5 @@ enum EnumDrawShape{
     DrawTriangle,
     DrawBezier
 };
+
+#endif

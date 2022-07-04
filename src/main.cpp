@@ -6,9 +6,13 @@
 #include "imgui_impl_glut.h"
 #include "imgui_impl_opengl2.h"
 
-#include "EnumDrawShape.h"
-#include "GlutPaint.h"
+// #include "GlobalState.h"
+// #include "EnumDrawShape.h"
+// #include "GlutPaint.h"
 #include "ImGuiPaint.h"
+
+// #include "gpShape.hpp"
+// #include "gpLine.h"
 
 void display();
 void cleanup();
@@ -24,7 +28,8 @@ int main(int argc, char** argv)
 
     glutCloseFunc(cleanup);
 
-    // event handler here
+    // event handler
+    GlutPaintInstallFuncs();
 
     glutMainLoop();
 
@@ -44,6 +49,9 @@ void display(){
 }
 
 void cleanup(){
+
+    GlutPaintCleanup();
+
     // Cleanup
     ImGui_ImplOpenGL2_Shutdown();
     ImGui_ImplGLUT_Shutdown();
