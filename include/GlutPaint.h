@@ -10,6 +10,7 @@
 #include "gpLine.h"
 #include "gpRectangle.h"
 #include "gpTriangle.h"
+#include "gpCircle.h"
 
 // window global variables
 
@@ -110,6 +111,9 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
                 break;
             case DrawTriangle:
                 current_drawing = new gpTriangle(x,y);
+                break;
+            case DrawCircle:
+                current_drawing = new gpCircle(x,y);
                 break;
 
             default:

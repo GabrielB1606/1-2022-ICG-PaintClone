@@ -19,10 +19,8 @@ class gpShape
 	public:
 		gpShape(int x0, int y0){
 			ImGuiIO& io = ImGui::GetIO();
-			vertex[0][0] = x0;
-			vertex[0][1] = (int)io.DisplaySize.y - y0;
-			vertex[1][0] = x0;
-			vertex[1][1] = (int)io.DisplaySize.y - y0;
+			center[0] = vertex[1][0] = vertex[0][0] = x0;
+			center[1] = vertex[1][1] = vertex[0][1] = (int)io.DisplaySize.y - y0;
 		}
 
 		~gpShape(){
@@ -57,6 +55,10 @@ class gpShape
 			ImGuiIO& io = ImGui::GetIO();
 			vertex[n][0] = x;
 			vertex[n][1] = (int)io.DisplaySize.y - y;
+
+			center[0] = (vertex[0][0]+vertex[1][0]) >> 1;
+			center[1] = (vertex[0][1]+vertex[1][1]) >> 1;
+
 		}
 
 		void setVertexCenterMode(int n, int x, int y){
