@@ -14,6 +14,7 @@ class gpShape
 	protected:
 		ImVec4 color;
 		int vertex[2][2];
+		int center[2];
 
 	public:
 		gpShape(int x0, int y0){
@@ -57,6 +58,23 @@ class gpShape
 			vertex[n][0] = x;
 			vertex[n][1] = (int)io.DisplaySize.y - y;
 		}
+
+		void setVertexCenterMode(int n, int x, int y){
+			ImGuiIO& io = ImGui::GetIO();
+			vertex[n][0] = x;
+			vertex[n][1] = (int)io.DisplaySize.y - y;
+
+			int m = (n+1)&1;
+			vertex[m][0] = center[0] + (center[0] - vertex[n][0]);
+			vertex[m][1] = center[1] + (center[1] - vertex[n][1]);
+		}
+
+		void setCenter(int x, int y){
+			ImGuiIO& io = ImGui::GetIO();
+			center[0] = x;
+			center[1] =  (int)io.DisplaySize.y - y;
+		}
+		
 
 		// podríamos responder a los eventos del mouse
 		// . todos responden al click, pero solo uno puede

@@ -58,23 +58,19 @@ void ImGuiPaintDisplay(){
         ImGui::Separator();
         ImGui::Text("Draw");
 
-        switch (current_shape)
-        {
-        case DrawEllipse:
-        case DrawCircle:
-        case DrawRectangle:
-            ImGui::Checkbox("Center Mode", &alt_drawing_mode);
-            ImGui::SameLine();
-            HelpMarker("The first point given will be taken as the center.\n\n(Drag while pressing Alt)");
-            break;
-        case DrawTriangle:
-            ImGui::Checkbox("Vertice Mode", &alt_drawing_mode);
-            ImGui::SameLine();
-            HelpMarker("Click three times to define the position of each vertex.");
-            break;
+        ImGui::Checkbox("Center Mode", &center_mode);
+        ImGui::SameLine();
+        HelpMarker("The first point given will be taken as the center.\n\n(Drag while pressing Alt)");
+
+        switch (current_shape){
+            case DrawTriangle:
+                ImGui::Checkbox("Vertice Mode", &vertice_mode);
+                ImGui::SameLine();
+                HelpMarker("Click three times to define the position of each vertex.");
+                break;
         
-        default:
-            break;
+            default:
+                break;
         }
 
         ImGui::Text("Shape");

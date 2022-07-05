@@ -26,7 +26,8 @@ static short vertex_dragging = -1;
 
 // drawing modes
 static bool hardware_mode = true;
-static bool alt_drawing_mode = false;
+static bool center_mode = false;
+static bool vertice_mode = false;
 
 void GlutPaintInit();
 void GlutPaintDisplay();
@@ -114,10 +115,12 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
             default:
                 break;
         }
+        if(center_mode)
+            current_drawing->setCenter(x,y);
         // fill_color = current_drawing->getColorReference();
         
     }else if( state == GLUT_UP ){
-        current_drawing->setVertex(vertex_dragging,x,y);
+        // current_drawing->setVertex(vertex_dragging,x,y);
         vertex_dragging = -1;
         shapes.emplace_back(current_drawing);
     }
@@ -130,7 +133,10 @@ void GlutPaintMotionFunc(int x, int y){
     io.AddMousePosEvent((float)x, (float)y);
 
     if( vertex_dragging != -1 ){
-        current_drawing->setVertex(vertex_dragging, x, y);
+        if( center_mode )
+            current_drawing->setVertexCenterMode(vertex_dragging, x, y);
+        else
+            current_drawing->setVertex(vertex_dragging, x, y);
     }
 }
 
