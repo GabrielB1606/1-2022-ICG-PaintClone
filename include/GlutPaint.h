@@ -11,6 +11,7 @@
 #include "gpRectangle.h"
 #include "gpTriangle.h"
 #include "gpCircle.h"
+#include "gpEllipse.h"
 
 // window global variables
 
@@ -114,6 +115,9 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
                 break;
             case DrawCircle:
                 current_drawing = new gpCircle(x,y);
+                break;
+            case DrawEllipse:
+                current_drawing = new gpEllipse(x,y);
                 break;
 
             default:

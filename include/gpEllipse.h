@@ -1,20 +1,20 @@
-#ifndef GP_CIRCLE_H
-#define GP_CIRCLE_H
+#ifndef GP_ELLIPSE_H
+#define GP_ELLIPSE_H
 
 #include <math.h>
 // #include "gpShape.hpp"
 
-class gpCircle : public gpShape{
+class gpEllipse : public gpShape{
 
 	private:
 
 	public:
-		gpCircle(int x0, int y0) : gpShape(x0, y0){
+		gpEllipse(int x0, int y0) : gpShape(x0, y0){
 			
 	
 		}
 
-		~gpCircle()
+		~gpEllipse()
 		{
 			cout << "Se destruyo una linea" << endl;
 		}
@@ -26,12 +26,11 @@ class gpCircle : public gpShape{
 			glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
 
 			float x = (float)center[0], y = (float)center[1];
-			float radius = abs(x - (float)vertex[0][0]);
+			float radiusx = abs(x - (float)vertex[0][0]);
 			float radiusy = abs(y - (float)vertex[0][1]);
 
-			radius = radius > radiusy? radius:radiusy;
 			// float radius = 10;
-			int triangleAmount = ((int)radius)<<1;
+			int triangleAmount = ((int)max(radiusx, radiusy) )<<1;
 			triangleAmount = triangleAmount < 100? triangleAmount:100;
 			
 			float theta = 6.28312f/triangleAmount;
@@ -42,8 +41,8 @@ class gpCircle : public gpShape{
 				glVertex2f(x, y); // center of circle
 				for(int i = 0; i <= triangleAmount;i++) {
 					glVertex2f(
-						x + (radius * cos(sum_theta) ),
-						y + (radius * sin(sum_theta) )
+						x + (radiusx * cos( sum_theta) ),
+						y + (radiusy * sin( sum_theta) )
 					);
 					sum_theta += theta;
 				}
