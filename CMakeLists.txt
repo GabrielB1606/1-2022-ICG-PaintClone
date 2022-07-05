@@ -16,7 +16,7 @@ target_link_directories( ${PROJECT_NAME} PRIVATE lib/ )
 target_link_libraries(${PROJECT_NAME} freeglut_staticd)
 
 # imgui demo
-add_executable(imgui_demo src/imgui_main.cpp ${IMGUI_SRC})
+add_executable(imgui_demo src/demo/imgui_main.cpp ${IMGUI_SRC})
 target_include_directories( imgui_demo PUBLIC include/ include/imgui )
 target_link_directories( imgui_demo PRIVATE lib/ )
 target_link_libraries(imgui_demo freeglut_staticd)

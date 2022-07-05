@@ -6,12 +6,15 @@
 #include "GL/freeglut.h"
 
 #include "EnumDrawShape.h"
-#include "gpShape.hpp"
+#include "gpShape.h"
 #include "gpLine.h"
+#include "gpRectangle.h"
+#include "gpTriangle.h"
 
 // window global variables
 
 static ImVec4 background_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+static int window_width = 1280, window_height = 720; 
 
 // drawing global variables
 static ImVec4 fill_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -69,11 +72,18 @@ void GlutPaintDisplay(){
     glEnd();
     glFlush();
 
-    for( gpShape* shape : shapes )
-        shape->render();
+    if( hardware_mode ){
 
-    if( current_drawing != nullptr )
-        current_drawing->render();
+        for( gpShape* shape : shapes )
+            shape->hardwareRender();
+
+
+        if( current_drawing != nullptr ){
+            current_drawing->setColor(fill_color);
+            current_drawing->hardwareRender();
+        }
+
+    }
 
 }
 
@@ -94,11 +104,16 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
             case DrawLine:
                 current_drawing = new gpLine(x, y);
                 break;
-            
+            case DrawRectangle:
+                current_drawing = new gpRectangle(x,y);
+                break;
+            case DrawTriangle:
+                current_drawing = new gpTriangle(x,y);
+                break;
+
             default:
                 break;
         }
-        current_drawing->setColor(fill_color);
         // fill_color = current_drawing->getColorReference();
         
     }else if( state == GLUT_UP ){

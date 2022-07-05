@@ -6,8 +6,6 @@
 #include "GL/freeglut.h"
 #include "imgui.h"
 
-#include "GlobalState.h"
-
 using namespace std;
 
 
@@ -19,10 +17,11 @@ class gpShape
 
 	public:
 		gpShape(int x0, int y0){
+			ImGuiIO& io = ImGui::GetIO();
 			vertex[0][0] = x0;
-			vertex[0][1] = window_height - y0;
+			vertex[0][1] = (int)io.DisplaySize.y - y0;
 			vertex[1][0] = x0;
-			vertex[1][1] = window_height - y0;
+			vertex[1][1] = (int)io.DisplaySize.y - y0;
 		}
 
 		~gpShape(){
@@ -39,7 +38,8 @@ class gpShape
 			this->color = color;
 		}
 
-		virtual void render() = 0;
+		virtual void softwareRender() = 0;
+		virtual void hardwareRender() = 0;
 		
 		// recibe el click del mouse y retorna true si efectivamente
 		// el objetos fue seleccionado
@@ -53,8 +53,9 @@ class gpShape
 		}
 
 		void setVertex(int n, int x, int y){
+			ImGuiIO& io = ImGui::GetIO();
 			vertex[n][0] = x;
-			vertex[n][1] = window_height - y;
+			vertex[n][1] = (int)io.DisplaySize.y - y;
 		}
 
 		// podríamos responder a los eventos del mouse

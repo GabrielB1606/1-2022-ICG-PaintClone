@@ -1,30 +1,22 @@
-#ifndef GP_LINE_H
-#define GP_LINE_H
+#ifndef GP_TRIANGLE_H
+#define GP_TRIANGLE_H
 
-// #include "gpShape.hpp"
+#include "gpShape.h"
 
-class gpLine : public gpShape{
+class gpTriangle : public gpShape{
 
 	private:
 
 	public:
-		gpLine(int x0, int y0) : gpShape(x0, y0){
+		gpTriangle(int x0, int y0) : gpShape(x0, y0){
 			
 	
 		}
 
-		~gpLine()
+		~gpTriangle()
 		{
 			cout << "Se destruyo una linea" << endl;
 		}
-
-		// void set(int x0, int y0, int x1, int y1)
-		// {
-		// 	this->vertex[0][0] = x0;
-		// 	this->y0 = y0;
-		// 	this->x1 = x1;
-		// 	this->y1 = y1;
-		// }
 
 		void hardwareRender()
 		{
@@ -33,9 +25,10 @@ class gpLine : public gpShape{
 			glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
 
 			// user putpixel de aquí en adelante... con Bresenham
-			glBegin(GL_LINES);
-				glVertex2i(vertex[0][0], vertex[0][1]);
+			glBegin( GL_TRIANGLES );
+				glVertex2i(vertex[0][0], vertex[1][1]);
 				glVertex2i(vertex[1][0], vertex[1][1]);
+				glVertex2i( (vertex[0][0]+vertex[1][0])>>1 , vertex[0][1]);
 			glEnd();
 		}
 

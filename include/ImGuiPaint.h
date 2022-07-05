@@ -62,6 +62,7 @@ void ImGuiPaintDisplay(){
         {
         case DrawEllipse:
         case DrawCircle:
+        case DrawRectangle:
             ImGui::Checkbox("Center Mode", &alt_drawing_mode);
             ImGui::SameLine();
             HelpMarker("The first point given will be taken as the center.\n\n(Drag while pressing Alt)");
