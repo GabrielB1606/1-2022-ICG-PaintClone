@@ -7,6 +7,9 @@ class gpLine : public gpShape{
 
 	private:
 
+		float m;
+		int main_axis = 0;
+
 	public:
 		gpLine(int x0, int y0) : gpShape(x0, y0){
 			
@@ -18,13 +21,29 @@ class gpLine : public gpShape{
 			cout << "Se destruyo una linea" << endl;
 		}
 
-		// void set(int x0, int y0, int x1, int y1)
-		// {
-		// 	this->vertex[0][0] = x0;
-		// 	this->y0 = y0;
-		// 	this->x1 = x1;
-		// 	this->y1 = y1;
-		// }
+		bool updateSlope(){
+	
+			if( vertex[0][main_axis] > vertex[1][main_axis] ){
+				swap( vertex[0], vertex[1] );
+				vertex_dragging = (vertex_dragging + 1)&1;
+			}
+
+			int sec_axis = (main_axis+1)&1;
+			m = (float)(vertex[1][sec_axis] - vertex[0][sec_axis])/(vertex[1][main_axis] - vertex[0][main_axis]);
+
+			return (m>=-1 && m<=1);
+		}
+
+		void setVertex(int n, int x, int y){
+
+			gpShape::setVertex(n,x,y);
+
+			if( !updateSlope() ){
+				main_axis = (main_axis+1)&1;
+				updateSlope();
+			}
+
+		}
 
 		void hardwareRender()
 		{
@@ -40,6 +59,17 @@ class gpLine : public gpShape{
 		}
 
 		void softwareRender(){
+			
+			glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
+
+			float point[2] = { (float)vertex[0][0], (float)vertex[0][1] };
+
+			int sec_axis = (main_axis+1)&1;
+
+			for(; point[main_axis]<vertex[1][main_axis]; point[main_axis]++){
+				putPixel(round(point[0]), round(point[1]));
+				point[sec_axis] += m;
+			}
 
 		}
 

@@ -2,6 +2,8 @@
 #define GLUT_PAINT_H
 
 #include <deque>
+#include <algorithm>
+#include <math.h>
 
 #include "GL/freeglut.h"
 
@@ -24,7 +26,7 @@ static ImVec4 border_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
 static int current_shape = 0;
 deque<gpShape*> shapes;
 gpShape* current_drawing = nullptr;
-static short vertex_dragging = -1;
+// static short vertex_dragging = -1;
 
 // drawing modes
 static bool hardware_mode = true;
@@ -84,6 +86,17 @@ void GlutPaintDisplay(){
         if( current_drawing != nullptr ){
             current_drawing->setColor(fill_color);
             current_drawing->hardwareRender();
+        }
+
+    }else{
+
+        for( gpShape* shape : shapes )
+            shape->softwareRender();
+
+
+        if( current_drawing != nullptr ){
+            current_drawing->setColor(fill_color);
+            current_drawing->softwareRender();
         }
 
     }

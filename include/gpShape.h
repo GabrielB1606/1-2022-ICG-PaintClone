@@ -8,6 +8,7 @@
 
 using namespace std;
 
+static short vertex_dragging = -1;
 
 class gpShape
 {
@@ -28,6 +29,7 @@ class gpShape
 		}
 
 		void putPixel(int x, int y){
+			glPointSize(1.5f);
 			glBegin(GL_POINTS);
 			glVertex2i(x, y);
 			glEnd();
@@ -51,14 +53,14 @@ class gpShape
 			return &color;
 		}
 
-		void setVertex(int n, int x, int y){
+		// virtual void setVertex(int n, int x, int y) = 0;
+		virtual void setVertex(int n, int x, int y){
 			ImGuiIO& io = ImGui::GetIO();
 			vertex[n][0] = x;
 			vertex[n][1] = (int)io.DisplaySize.y - y;
 
 			center[0] = (vertex[0][0]+vertex[1][0]) >> 1;
 			center[1] = (vertex[0][1]+vertex[1][1]) >> 1;
-
 		}
 
 		void setVertexCenterMode(int n, int x, int y){
