@@ -45,6 +45,14 @@ class gpLine : public gpShape{
 
 		}
 
+		static void draw(int x0, int y0, int x1, int y1){
+
+			gpLine l(x0, y0);
+			l.setVertex(1, x1, y1);
+			l.softwareRender();
+
+		}
+
 		void hardwareRender()
 		{
 			// despliegas la línea con el algoritmo de bresenham

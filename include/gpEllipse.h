@@ -7,6 +7,7 @@
 class gpEllipse : public gpShape{
 
 	private:
+		int rx, ry;
 
 	public:
 		gpEllipse(int x0, int y0) : gpShape(x0, y0){
@@ -19,18 +20,25 @@ class gpEllipse : public gpShape{
 			cout << "Se destruyo una linea" << endl;
 		}
 
+		void setVertex(int n, int x, int y){
+
+			gpShape::setVertex(n,x,y);
+
+			rx = abs(center[0] - vertex[0][0]);
+			ry = abs(center[1] - vertex[0][1]);
+
+		}
+
 		void hardwareRender()
 		{
 			// despliegas la línea con el algoritmo de bresenham
 			// setColor(color[0], color[1], color[2]);
 			glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
 
-			float x = (float)center[0], y = (float)center[1];
-			float radiusx = abs(x - (float)vertex[0][0]);
-			float radiusy = abs(y - (float)vertex[0][1]);
+			int x = center[0], y = center[1];
 
 			// float radius = 10;
-			int triangleAmount = ((int)max(radiusx, radiusy) )<<1;
+			int triangleAmount = ( MAX(rx, ry) )<<1;
 			triangleAmount = triangleAmount < 100? triangleAmount:100;
 			
 			float theta = 6.28312f/triangleAmount;
@@ -38,11 +46,11 @@ class gpEllipse : public gpShape{
 
 			glBegin(GL_TRIANGLE_FAN);
 
-				glVertex2f(x, y); // center of circle
+				glVertex2i(x, y); // center of circle
 				for(int i = 0; i <= triangleAmount;i++) {
 					glVertex2f(
-						x + (radiusx * cos( sum_theta) ),
-						y + (radiusy * sin( sum_theta) )
+						x + (rx * cos(sum_theta) ),
+						y + (ry * sin(sum_theta) )
 					);
 					sum_theta += theta;
 				}
@@ -52,7 +60,45 @@ class gpEllipse : public gpShape{
 		}
 
 		void softwareRender(){
+			
+			glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
 
+			int x, y, d;
+
+			x = 0;
+			y = ry;
+
+			d = ry * (4 * ry - 4 * rx*rx) + rx*rx;
+
+			while(ry*ry * 2 * (x + 1) < rx*rx * (2*y - 1)){
+				if(d < 0)
+					d = d + 4 * (ry*ry * (2*x + 3));
+				else {
+					d = d + 4 * (ry*ry * (2*x + 3) + rx*rx* (-2*y + 2));
+					y = y - 1;
+				}
+				x = x + 1;
+				putPixel(center[0] + x, center[1] + y);	
+				putPixel(center[0] - x, center[1] + y);	
+				putPixel(center[0] + x, center[1] - y);	
+				putPixel(center[0] - x, center[1] - y);	
+			}
+
+			d = ry*ry*(4*x*x+4*x+1) + rx*rx*(4*y*y-8*y+4)- 4*rx*rx *ry*ry;
+
+			while( y>0 ){
+				if( d<0 ){
+					d += 4 * (ry*ry*(2*x + 2) + rx*rx *(-2*y + 3));
+					x++;
+				}else{
+					d += 4*rx*rx* (-2*y + 3);
+				}
+				y--;
+				putPixel(center[0] + x, center[1] + y);	
+				putPixel(center[0] - x, center[1] + y);	
+				putPixel(center[0] + x, center[1] - y);	
+				putPixel(center[0] - x, center[1] - y);	
+			}
 		}
 
 		bool onClick(int x, int y) 
