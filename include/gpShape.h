@@ -6,9 +6,14 @@
 #include "GL/freeglut.h"
 #include "imgui.h"
 
+#define ROUNDNUM(x) ((int)( x >= .5f ? (x+1.0f) : x )) 
+#define MIN(x, y) ( x >= y ? y : x ) 
+#define MAX(x, y) ( x >= y ? x : y ) 
+
 using namespace std;
 
 static short vertex_dragging = -1;
+static bool center_mode = false;
 
 class gpShape
 {
@@ -59,18 +64,14 @@ class gpShape
 			vertex[n][0] = x;
 			vertex[n][1] = (int)io.DisplaySize.y - y;
 
-			center[0] = (vertex[0][0]+vertex[1][0]) >> 1;
-			center[1] = (vertex[0][1]+vertex[1][1]) >> 1;
-		}
-
-		void setVertexCenterMode(int n, int x, int y){
-			ImGuiIO& io = ImGui::GetIO();
-			vertex[n][0] = x;
-			vertex[n][1] = (int)io.DisplaySize.y - y;
-
-			int m = (n+1)&1;
-			vertex[m][0] = center[0] + (center[0] - vertex[n][0]);
-			vertex[m][1] = center[1] + (center[1] - vertex[n][1]);
+			if( !center_mode ){
+				center[0] = (vertex[0][0]+vertex[1][0]) >> 1;
+				center[1] = (vertex[0][1]+vertex[1][1]) >> 1;
+			}else{
+				int m = (n+1)&1;
+				vertex[m][0] = center[0] + (center[0] - vertex[n][0]);
+				vertex[m][1] = center[1] + (center[1] - vertex[n][1]);
+			}
 		}
 
 		void setCenter(int x, int y){

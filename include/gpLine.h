@@ -67,7 +67,7 @@ class gpLine : public gpShape{
 			int sec_axis = (main_axis+1)&1;
 
 			for(; point[main_axis]<vertex[1][main_axis]; point[main_axis]++){
-				putPixel(round(point[0]), round(point[1]));
+				putPixel(ROUNDNUM(point[0]), ROUNDNUM(point[1]));
 				point[sec_axis] += m;
 			}
 

@@ -41,7 +41,36 @@ class gpRectangle : public gpShape{
 			glEnd();
 		}
 
+        void setVertex(int n, int x, int y){
+
+			gpShape::setVertex(n,x,y);
+
+			if( vertex[0][0] > vertex[1][0] ){
+				swap( vertex[0], vertex[1] );
+				vertex_dragging = (vertex_dragging + 1)&1;
+			}
+
+		}
+
+        
+
 		void softwareRender(){
+
+			glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
+
+            int y0, y1;
+
+            if( vertex[0][1] > vertex[1][1] ){
+                y0 = vertex[1][1];
+                y1 = vertex[0][1];
+            }else{
+                y1 = vertex[1][1];
+                y0 = vertex[0][1];
+            }
+
+            for(int i = vertex[0][0]; i<vertex[1][0]; i++)
+                for(int  j = y0; j<y1; j++)
+                    putPixel(i,j);
 
 		}
 

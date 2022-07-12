@@ -30,7 +30,6 @@ gpShape* current_drawing = nullptr;
 
 // drawing modes
 static bool hardware_mode = true;
-static bool center_mode = false;
 static bool vertice_mode = false;
 
 void GlutPaintInit();
@@ -154,10 +153,7 @@ void GlutPaintMotionFunc(int x, int y){
     io.AddMousePosEvent((float)x, (float)y);
 
     if( vertex_dragging != -1 ){
-        if( center_mode )
-            current_drawing->setVertexCenterMode(vertex_dragging, x, y);
-        else
-            current_drawing->setVertex(vertex_dragging, x, y);
+        current_drawing->setVertex(vertex_dragging, x, y);
     }
 }
 
