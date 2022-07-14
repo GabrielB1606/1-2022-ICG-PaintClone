@@ -19,6 +19,7 @@ void ImGuiPaintInit(){
     ImGui_ImplGLUT_Init();
     ImGui_ImplGLUT_InstallFuncs();
     ImGui_ImplOpenGL2_Init();
+
 }
 
 void ImGuiPaintMotionFunc(int x, int y){

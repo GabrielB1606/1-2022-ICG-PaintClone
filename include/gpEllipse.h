@@ -24,8 +24,8 @@ class gpEllipse : public gpShape{
 
 			gpShape::setVertex(n,x,y);
 
-			rx = abs(center[0] - vertex[0][0]);
-			ry = abs(center[1] - vertex[0][1]);
+			rx = abs(getCenter()[0] - vertex[0][0]);
+			ry = abs(getCenter()[1] - vertex[0][1]);
 
 		}
 
@@ -35,7 +35,7 @@ class gpEllipse : public gpShape{
 			// setColor(color[0], color[1], color[2]);
 			glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
 
-			int x = center[0], y = center[1];
+			int x = getCenter()[0], y = getCenter()[1];
 
 			// float radius = 10;
 			int triangleAmount = ( MAX(rx, ry) )<<1;
@@ -46,11 +46,11 @@ class gpEllipse : public gpShape{
 
 			glBegin(GL_TRIANGLE_FAN);
 
-				glVertex2i(x, y); // center of circle
+				glVertex2i(x, window_height - y); // center of circle
 				for(int i = 0; i <= triangleAmount;i++) {
 					glVertex2f(
 						x + (rx * cos(sum_theta) ),
-						y + (ry * sin(sum_theta) )
+						window_height - (y + (ry * sin(sum_theta) ))
 					);
 					sum_theta += theta;
 				}
@@ -78,10 +78,10 @@ class gpEllipse : public gpShape{
 					y = y - 1;
 				}
 				x = x + 1;
-				putPixel(center[0] + x, center[1] + y);	
-				putPixel(center[0] - x, center[1] + y);	
-				putPixel(center[0] + x, center[1] - y);	
-				putPixel(center[0] - x, center[1] - y);	
+				putPixel(getCenter()[0] + x, getCenter()[1] + y);	
+				putPixel(getCenter()[0] - x, getCenter()[1] + y);	
+				putPixel(getCenter()[0] + x, getCenter()[1] - y);	
+				putPixel(getCenter()[0] - x, getCenter()[1] - y);	
 			}
 
 			d = ry*ry*(4*x*x+4*x+1) + rx*rx*(4*y*y-8*y+4)- 4*rx*rx *ry*ry;
@@ -94,10 +94,10 @@ class gpEllipse : public gpShape{
 					d += 4*rx*rx* (-2*y + 3);
 				}
 				y--;
-				putPixel(center[0] + x, center[1] + y);	
-				putPixel(center[0] - x, center[1] + y);	
-				putPixel(center[0] + x, center[1] - y);	
-				putPixel(center[0] - x, center[1] - y);	
+				putPixel(getCenter()[0] + x, getCenter()[1] + y);	
+				putPixel(getCenter()[0] - x, getCenter()[1] + y);	
+				putPixel(getCenter()[0] + x, getCenter()[1] - y);	
+				putPixel(getCenter()[0] - x, getCenter()[1] - y);	
 			}
 		}
 

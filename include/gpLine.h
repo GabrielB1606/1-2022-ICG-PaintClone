@@ -12,13 +12,19 @@ class gpLine : public gpShape{
 
 	public:
 		gpLine(int x0, int y0) : gpShape(x0, y0){
-			
-	
+		}
+
+		gpLine(int x0, int y0, int x1, int y1, ImVec4 color) : gpShape(x0, y0, x1, y1, color){
+		}
+
+		gpLine(ImVec4 color): gpShape(color){
+			vertex[2][0] = vertex[1][0] = vertex[0][0] = 1;
+			vertex[2][1] = vertex[1][1] = vertex[0][1] = 1;
 		}
 
 		~gpLine()
 		{
-			cout << "Se destruyo una linea" << endl;
+			// cout << "Se destruyo una linea" << endl;
 		}
 
 		bool updateSlope(){
@@ -45,10 +51,11 @@ class gpLine : public gpShape{
 
 		}
 
-		static void draw(int x0, int y0, int x1, int y1){
+		static void draw(int x0, int y0, int x1, int y1, ImVec4 color){
 
 			gpLine l(x0, y0);
 			l.setVertex(1, x1, y1);
+			l.setColor(color);
 			l.softwareRender();
 
 		}
@@ -61,8 +68,8 @@ class gpLine : public gpShape{
 
 			// user putpixel de aquí en adelante... con Bresenham
 			glBegin(GL_LINES);
-				glVertex2i(vertex[0][0], vertex[0][1]);
-				glVertex2i(vertex[1][0], vertex[1][1]);
+				glVertex2i(vertex[0][0], window_height - vertex[0][1]);
+				glVertex2i(vertex[1][0], window_height - vertex[1][1]);
 			glEnd();
 		}
 

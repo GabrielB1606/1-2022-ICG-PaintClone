@@ -24,8 +24,8 @@ class gpCircle : public gpShape{
 
 			gpShape::setVertex(n,x,y);
 
-			int radius_x = abs(center[0] - vertex[0][0]);
-			int radius_y = abs(center[1] - vertex[0][1]);
+			int radius_x = abs(getCenter()[0] - vertex[0][0]);
+			int radius_y = abs(getCenter()[1] - vertex[0][1]);
 
 			r = radius_x < radius_y? radius_x:radius_y;
 
@@ -37,7 +37,7 @@ class gpCircle : public gpShape{
 			// setColor(color[0], color[1], color[2]);
 			glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
 
-			float x = (float)center[0], y = (float)center[1];
+			float x = (float)getCenter()[0], y = (float)getCenter()[1];
 
 			// float radius = 10;
 			int triangleAmount = ((int)r)<<1;
@@ -48,11 +48,11 @@ class gpCircle : public gpShape{
 
 			glBegin(GL_TRIANGLE_FAN);
 
-				glVertex2f(x, y); // center of circle
+				glVertex2f(x, window_height - y); // center of circle
 				for(int i = 0; i <= triangleAmount;i++) {
 					glVertex2f(
 						x + (r * cos(sum_theta) ),
-						y + (r * sin(sum_theta) )
+						window_height - (y + (r * sin(sum_theta) ))
 					);
 					sum_theta += theta;
 				}
@@ -80,8 +80,8 @@ class gpCircle : public gpShape{
 
 				for(int i = -1; i<2; i+=2)
 					for(int j = -1; j<2; j+=2){
-						putPixel(center[0]+j*point[0], center[1]+i*point[1] );
-						putPixel(center[0]+j*point[1], center[1]+i*point[0] );
+						putPixel(getCenter()[0]+j*point[0], getCenter()[1]+i*point[1] );
+						putPixel(getCenter()[0]+j*point[1], getCenter()[1]+i*point[0] );
 					}
 				
 			}

@@ -7,6 +7,8 @@
 
 #include "GL/freeglut.h"
 
+static int window_width = 1280, window_height = 720; 
+
 #include "EnumDrawShape.h"
 #include "gpShape.h"
 #include "gpLine.h"
@@ -18,7 +20,6 @@
 // window global variables
 
 static ImVec4 background_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
-static int window_width = 1280, window_height = 720; 
 
 // drawing global variables
 static ImVec4 fill_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -30,7 +31,6 @@ gpShape* current_drawing = nullptr;
 
 // drawing modes
 static bool hardware_mode = true;
-static bool vertice_mode = false;
 
 void GlutPaintInit();
 void GlutPaintDisplay();
@@ -135,8 +135,8 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
             default:
                 break;
         }
-        if(center_mode)
-            current_drawing->setCenter(x,y);
+        // if(center_mode)
+        //     current_drawing->setCenter(x,y);
         // fill_color = current_drawing->getColorReference();
         
     }else if( state == GLUT_UP ){

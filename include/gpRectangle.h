@@ -34,10 +34,10 @@ class gpRectangle : public gpShape{
 
 			// user putpixel de aquí en adelante... con Bresenham
 			glBegin(GL_QUADS);
-				glVertex2i(vertex[0][0], vertex[0][1]);
-				glVertex2i(vertex[1][0], vertex[0][1]);
-				glVertex2i(vertex[1][0], vertex[1][1]);
-				glVertex2i(vertex[0][0], vertex[1][1]);
+				glVertex2i(vertex[0][0], window_height -vertex[0][1]);
+				glVertex2i(vertex[1][0], window_height -vertex[0][1]);
+				glVertex2i(vertex[1][0], window_height -vertex[1][1]);
+				glVertex2i(vertex[0][0], window_height -vertex[1][1]);
 			glEnd();
 		}
 
