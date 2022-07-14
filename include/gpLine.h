@@ -29,10 +29,10 @@ class gpLine : public gpShape{
 
 		bool updateSlope(){
 	
-			if( vertex[0][main_axis] > vertex[1][main_axis] ){
-				swap( vertex[0], vertex[1] );
-				vertex_dragging = (vertex_dragging + 1)&1;
-			}
+			// if( vertex[0][main_axis] > vertex[1][main_axis] ){
+			// 	swap( vertex[0], vertex[1] );
+			// 	vertex_dragging = (vertex_dragging + 1)&1;
+			// }
 
 			int sec_axis = (main_axis+1)&1;
 			m = (float)(vertex[1][sec_axis] - vertex[0][sec_axis])/(vertex[1][main_axis] - vertex[0][main_axis]);
@@ -77,11 +77,22 @@ class gpLine : public gpShape{
 			
 			glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
 
-			float point[2] = { (float)vertex[0][0], (float)vertex[0][1] };
+			float point[2];
+			float final;
+
+			if(vertex[0][main_axis] < vertex[1][main_axis]){
+				point[0] = (float)vertex[0][0];
+				point[1] = (float)vertex[0][1];
+				final = (float)vertex[1][main_axis];
+			}else{
+				final = (float)vertex[0][main_axis];
+				point[0] = (float)vertex[1][0];
+				point[1] = (float)vertex[1][1];
+			}
 
 			int sec_axis = (main_axis+1)&1;
 
-			for(; point[main_axis]<vertex[1][main_axis]; point[main_axis]++){
+			for(; point[main_axis]<final; point[main_axis]++){
 				putPixel(ROUNDNUM(point[0]), ROUNDNUM(point[1]));
 				point[sec_axis] += m;
 			}
