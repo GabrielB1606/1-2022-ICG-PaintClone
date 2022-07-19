@@ -23,7 +23,7 @@ static ImVec4 background_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
 
 // drawing global variables
 static ImVec4 fill_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
-static ImVec4 border_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+static ImVec4 border_color = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
 static int current_shape = 0;
 deque<gpShape*> shapes;
 gpShape* current_drawing = nullptr;
@@ -76,30 +76,16 @@ void GlutPaintDisplay(){
     glEnd();
     glFlush();
 
-    if( hardware_mode ){
-
-        for( gpShape* shape : shapes )
-            shape->hardwareRender();
-
-
-        if( current_drawing != nullptr ){
-            current_drawing->setColor(fill_color);
-            current_drawing->hardwareRender();
-        }
-
-    }else{
-
-        for( gpShape* shape : shapes )
-            shape->softwareRender();
-
-
-        if( current_drawing != nullptr ){
-            current_drawing->setColor(fill_color);
-            current_drawing->softwareRender();
-        }
-
+    if( current_drawing != nullptr ){
+        current_drawing->setFillColor(fill_color);
+        current_drawing->setBorderColor(border_color);
     }
 
+    for( gpShape* shape : shapes )
+        shape->render(hardware_mode);
+    
+    if( current_drawing != nullptr )
+        current_drawing->render(hardware_mode);
 }
 
 void GlutPaintMouseFunc(int glut_button, int state, int x, int y){

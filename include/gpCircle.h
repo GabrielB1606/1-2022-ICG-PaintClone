@@ -31,11 +31,7 @@ class gpCircle : public gpShape{
 
 		}
 
-		void hardwareRender()
-		{
-			// despliegas la línea con el algoritmo de bresenham
-			// setColor(color[0], color[1], color[2]);
-			glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
+		void hardwareRenderFill(){
 
 			float x = (float)getCenter()[0], y = (float)getCenter()[1];
 
@@ -61,9 +57,31 @@ class gpCircle : public gpShape{
 
 		}
 
-		void softwareRender(){
+		void hardwareRenderBorder(){
+			float x = (float)getCenter()[0], y = (float)getCenter()[1];
 
-			glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
+			// float radius = 10;
+			int triangleAmount = ((int)r)<<1;
+			triangleAmount = triangleAmount < 100? triangleAmount:100;
+			
+			float theta = 6.28312f/triangleAmount;
+			float sum_theta = 0;
+
+			glBegin(GL_LINE_LOOP);
+
+				// glVertex2f(x, window_height - y); // center of circle
+				for(int i = 0; i <= triangleAmount;i++) {
+					glVertex2f(
+						x + (r * cos(sum_theta) ),
+						window_height - (y + (r * sin(sum_theta) ))
+					);
+					sum_theta += theta;
+				}
+
+			glEnd();
+		}
+
+		void softwareRenderBorder(){
 
 			int point[2] = {0, r};
 
@@ -85,6 +103,10 @@ class gpCircle : public gpShape{
 					}
 				
 			}
+
+		}
+
+		void softwareRenderFill(){
 
 		}
 

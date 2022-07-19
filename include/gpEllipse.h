@@ -29,15 +29,10 @@ class gpEllipse : public gpShape{
 
 		}
 
-		void hardwareRender()
+		void hardwareRenderFill()
 		{
-			// despliegas la línea con el algoritmo de bresenham
-			// setColor(color[0], color[1], color[2]);
-			glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
-
 			int x = getCenter()[0], y = getCenter()[1];
 
-			// float radius = 10;
 			int triangleAmount = ( MAX(rx, ry) )<<1;
 			triangleAmount = triangleAmount < 100? triangleAmount:100;
 			
@@ -59,9 +54,32 @@ class gpEllipse : public gpShape{
 
 		}
 
-		void softwareRender(){
+		void hardwareRenderBorder(){
+			int x = getCenter()[0], y = getCenter()[1];
+
+			int triangleAmount = ( MAX(rx, ry) )<<1;
+			triangleAmount = triangleAmount < 100? triangleAmount:100;
 			
-			glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
+			float theta = 6.28312f/triangleAmount;
+			float sum_theta = 0;
+
+			glBegin(GL_LINE_LOOP);
+
+				// glVertex2i(x, window_height - y); // center of circle
+				for(int i = 0; i <= triangleAmount;i++) {
+					glVertex2f(
+						x + (rx * cos(sum_theta) ),
+						window_height - (y + (ry * sin(sum_theta) ))
+					);
+					sum_theta += theta;
+				}
+
+			glEnd();
+		}
+
+		void softwareRenderFill(){}
+
+		void softwareRenderBorder(){
 
 			int x, y, d;
 

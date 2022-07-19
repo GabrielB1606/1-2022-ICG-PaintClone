@@ -39,13 +39,8 @@ class gpTriangle : public gpShape{
             
         }
 
-		void hardwareRender()
+		void hardwareRenderFill()
 		{
-			// despliegas la línea con el algoritmo de bresenham
-			// setColor(color[0], color[1], color[2]);
-			glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
-
-			// user putpixel de aquí en adelante... con Bresenham
 			glBegin( GL_TRIANGLES );
 				glVertex2i(vertex[0][0], window_height - vertex[0][1]);
 				glVertex2i(vertex[1][0], window_height - vertex[1][1]);
@@ -53,22 +48,24 @@ class gpTriangle : public gpShape{
 			glEnd();
 		}
 
-		void softwareRender(){
+		void hardwareRenderBorder(){
+			glBegin( GL_LINE_LOOP );
+				glVertex2i(vertex[0][0], window_height - vertex[0][1]);
+				glVertex2i(vertex[1][0], window_height - vertex[1][1]);
+				glVertex2i(vertex[2][0], window_height - vertex[2][1]);
+			glEnd();
+		}
 
-			// glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
-			color.x = 0;
-			color.y = 0;
-			color.z = 1;
-            gpLine::draw( vertex[0][0], vertex[0][1], vertex[1][0], vertex[1][1], color );
-			color.x = 0;
-			color.y = 1;
-			color.z = 0;
-            gpLine::draw( vertex[1][0], vertex[1][1], vertex[2][0], vertex[2][1], color );
-			color.x = 1;
-			color.y = 0;
-			color.z = 0;
-            gpLine::draw( vertex[0][0], vertex[0][1], vertex[2][0], vertex[2][1], color );
+		void softwareRenderBorder(){
 
+            gpLine::draw( vertex[0][0], vertex[0][1], vertex[1][0], vertex[1][1], border_color );
+            gpLine::draw( vertex[1][0], vertex[1][1], vertex[2][0], vertex[2][1], border_color );
+            gpLine::draw( vertex[0][0], vertex[0][1], vertex[2][0], vertex[2][1], border_color );
+
+		}
+
+		void softwareRenderFill(){
+			
 		}
 
 		bool onClick(int x, int y) 

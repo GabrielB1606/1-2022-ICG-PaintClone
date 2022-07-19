@@ -69,7 +69,7 @@ void ImGuiPaintDisplay(){
                 ImGui::SameLine();
                 HelpMarker("Click three times to define the position of each vertex.");
                 break;
-        
+
             default:
                 break;
         }
@@ -88,7 +88,10 @@ void ImGuiPaintDisplay(){
         ImGui::ListBox(" ", &current_shape, shapes, IM_ARRAYSIZE(shapes), 6);
 
         ImGui::Text("Colors");
-        ImGui::ColorEdit3("Fill", (float*)&fill_color); // Edit 3 floats representing a color
+
+        if( current_shape != DrawBezier && current_shape != DrawLine )
+            ImGui::ColorEdit3("Fill", (float*)&fill_color); // Edit 3 floats representing a color
+        
         ImGui::ColorEdit3("Border", (float*)&border_color); // Edit 3 floats representing a color
         
     ImGui::End();

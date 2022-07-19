@@ -20,7 +20,7 @@ class gpShape
 {
 
 	protected:
-		ImVec4 color;
+		ImVec4 border_color, fill_color;
 		int vertex[3][2];
 
 	public:
@@ -30,16 +30,16 @@ class gpShape
 			vertex[2][1] = vertex[1][1] = vertex[0][1] = y0;
 		}
 
-		gpShape(int x0, int y0, int x1, int y1, ImVec4 color){
-			this->color = color;
+		gpShape(int x0, int y0, int x1, int y1, ImVec4 border_color){
+			this->border_color = border_color;
 			vertex[2][0] = vertex[0][0] = x0;
 			vertex[2][1] = vertex[0][1] = y0;
 			vertex[1][0] = x1;
 			vertex[1][1] = y1;
 		}
 
-		gpShape(ImVec4 color){
-			this->color = color;
+		gpShape(ImVec4 border_color){
+			this->border_color = border_color;
 		}
 
 		~gpShape(){
@@ -67,13 +67,36 @@ class gpShape
 			glEnd();
 		}
 
-		void setColor(ImVec4 color){
-			this->color = color;
+		void setBorderColor(ImVec4 border_color){
+			this->border_color = border_color;
 		}
 
-		virtual void softwareRender() = 0;
-		virtual void hardwareRender() = 0;
+		void setFillColor(ImVec4 fill_color){
+			this->fill_color = fill_color;
+		}
+
+		virtual void softwareRenderBorder() = 0;
+		virtual void softwareRenderFill() = 0;
 		
+		virtual void hardwareRenderBorder() = 0;
+		virtual void hardwareRenderFill() = 0;
+		
+		void render(bool isHardwareMode){
+			glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
+
+			if(isHardwareMode)
+				hardwareRenderFill();
+			else
+				softwareRenderFill();
+
+			glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
+
+			if(isHardwareMode)
+				hardwareRenderBorder();
+			else
+				softwareRenderBorder();
+		}
+
 		// recibe el click del mouse y retorna true si efectivamente
 		// el objetos fue seleccionado
 		// virtual bool onClick(int x, int y);
@@ -81,8 +104,12 @@ class gpShape
 		// // este método es invocado solo hacia el objeto "current"
 		// virtual void onMove(int x, int y);
 
-		ImVec4* getColorReference(){
-			return &color;
+		ImVec4* getBorderColorReference(){
+			return &border_color;
+		}
+
+		ImVec4* getFillColorReference(){
+			return &fill_color;
 		}
 
 		// virtual void setVertex(int n, int x, int y) = 0;

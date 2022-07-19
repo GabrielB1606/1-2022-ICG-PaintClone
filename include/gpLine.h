@@ -55,16 +55,16 @@ class gpLine : public gpShape{
 
 			gpLine l(x0, y0);
 			l.setVertex(1, x1, y1);
-			l.setColor(color);
-			l.softwareRender();
+			l.setBorderColor(color);
+			l.softwareRenderBorder();
 
 		}
 
-		void hardwareRender()
+		void hardwareRenderBorder()
 		{
 			// despliegas la línea con el algoritmo de bresenham
 			// setColor(color[0], color[1], color[2]);
-			glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
+			glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
 
 			// user putpixel de aquí en adelante... con Bresenham
 			glBegin(GL_LINES);
@@ -73,9 +73,11 @@ class gpLine : public gpShape{
 			glEnd();
 		}
 
-		void softwareRender(){
+		void hardwareRenderFill(){}
+
+		void softwareRenderBorder(){
 			
-			glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
+			glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
 
 			float point[2];
 			float final;
@@ -98,6 +100,8 @@ class gpLine : public gpShape{
 			}
 
 		}
+
+		void softwareRenderFill(){}
 
 		bool onClick(int x, int y) 
 		{

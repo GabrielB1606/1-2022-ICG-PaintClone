@@ -26,14 +26,17 @@ class gpRectangle : public gpShape{
 		// 	this->y1 = y1;
 		// }
 
-		void hardwareRender()
-		{
-			// despliegas la línea con el algoritmo de bresenham
-			// setColor(color[0], color[1], color[2]);
-			glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
-
-			// user putpixel de aquí en adelante... con Bresenham
+		void hardwareRenderFill(){
 			glBegin(GL_QUADS);
+				glVertex2i(vertex[0][0], window_height -vertex[0][1]);
+				glVertex2i(vertex[1][0], window_height -vertex[0][1]);
+				glVertex2i(vertex[1][0], window_height -vertex[1][1]);
+				glVertex2i(vertex[0][0], window_height -vertex[1][1]);
+			glEnd();
+		}
+
+		void hardwareRenderBorder(){
+			glBegin(GL_LINE_LOOP);
 				glVertex2i(vertex[0][0], window_height -vertex[0][1]);
 				glVertex2i(vertex[1][0], window_height -vertex[0][1]);
 				glVertex2i(vertex[1][0], window_height -vertex[1][1]);
@@ -54,9 +57,7 @@ class gpRectangle : public gpShape{
 
         
 
-		void softwareRender(){
-
-			glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
+		void softwareRenderFill(){
 
             int y0, y1;
 
@@ -73,6 +74,8 @@ class gpRectangle : public gpShape{
                     putPixel(i,j);
 
 		}
+
+		void softwareRenderBorder(){}
 
 		bool onClick(int x, int y) 
 		{
