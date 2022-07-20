@@ -75,7 +75,29 @@ class gpRectangle : public gpShape{
 
 		}
 
-		void softwareRenderBorder(){}
+		void softwareRenderBorder(){
+			
+			int y0, y1;
+
+            if( vertex[0][1] > vertex[1][1] ){
+                y0 = vertex[1][1];
+                y1 = vertex[0][1];
+            }else{
+                y1 = vertex[1][1];
+                y0 = vertex[0][1];
+            }
+
+			for(int i = vertex[0][0]; i<vertex[1][0]; i++){
+				putPixel(i, y0);
+				putPixel(i, y1);
+			}
+
+			for(int i = y0; i<y1; i++){
+				putPixel(vertex[0][0], i);
+				putPixel(vertex[1][0], i);
+			}
+
+		}
 
 		bool onClick(int x, int y) 
 		{

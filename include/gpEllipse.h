@@ -7,7 +7,7 @@
 class gpEllipse : public gpShape{
 
 	private:
-		int rx, ry;
+		int rx, ry, rxrx, ryry;
 
 	public:
 		gpEllipse(int x0, int y0) : gpShape(x0, y0){
@@ -26,6 +26,8 @@ class gpEllipse : public gpShape{
 
 			rx = abs(getCenter()[0] - vertex[0][0]);
 			ry = abs(getCenter()[1] - vertex[0][1]);
+			rxrx = rx*rx;
+			ryry = ry*ry; 
 
 		}
 
@@ -77,7 +79,64 @@ class gpEllipse : public gpShape{
 			glEnd();
 		}
 
-		void softwareRenderFill(){}
+		static void draw(int center[2], int rx, int ry){
+			int x, y, d;
+			int rxrx = rx*rx;
+			int ryry = ry*ry;
+
+			x = 0;
+			y = ry;
+
+			d = ry * ((ry - rxrx)<<2) + rxrx;
+
+			while( ((ryry * (x + 1)) << 1) < rxrx * ((y<<1) - 1) ){
+				putPixel(center[0] + x, center[1] + y);	
+				putPixel(center[0] - x, center[1] + y);	
+				putPixel(center[0] + x, center[1] - y);	
+				putPixel(center[0] - x, center[1] - y);	
+				if(d < 0)
+					d += ((ryry * ((x<<1) + 3))<<2);
+				else {
+					d += ((ryry * ((x<<1) + 3) + rxrx* (-(y<<1) + 2))<<2);
+					y --;
+				}
+				x ++;
+			}
+
+			d = ryry*( ((x*x+x)<<2) +1) + rxrx*( ((y*y-(y<<1))<<2) +4 )- ((rxrx*ryry) << 2);
+
+			while( y>=0 ){
+				putPixel(center[0] + x, center[1] + y);	
+				putPixel(center[0] - x, center[1] + y);	
+				putPixel(center[0] + x, center[1] - y);	
+				putPixel(center[0] - x, center[1] - y);	
+				if( d<0 ){
+					d += (ryry*((x + 1)<<1) + rxrx *(-(y<<1) + 3)) << 2;
+					x++;
+				}else{
+					d += (rxrx<<2)*(-(y<<1) + 3);
+				}
+				y--;
+			}
+		}
+
+		void softwareRenderFill(){
+
+			if( rx < ry ){
+				for(int i = 0; i<rx; i++)
+					gpCircle::draw(getCenter(), i);
+				
+				for(int i = rx; i<ry; i++)
+					gpEllipse::draw(getCenter(), rx, i);
+			}else{
+				for(int i = 0; i<ry; i++)
+					gpCircle::draw(getCenter(), i);
+				
+				for(int i = ry; i<rx; i++)
+					gpEllipse::draw(getCenter(), i, ry);
+			}
+
+		}
 
 		void softwareRenderBorder(){
 
@@ -86,30 +145,30 @@ class gpEllipse : public gpShape{
 			x = 0;
 			y = ry;
 
-			d = ry * (4 * ry - 4 * rx*rx) + rx*rx;
+			d = ry * ((ry - rxrx)<<2) + rxrx;
 
-			while(ry*ry * 2 * (x + 1) < rx*rx * (2*y - 1)){
+			while( ((ryry * (x + 1)) << 1) < rxrx * ((y<<1) - 1) ){
 				if(d < 0)
-					d = d + 4 * (ry*ry * (2*x + 3));
+					d += ((ryry * ((x<<1) + 3))<<2);
 				else {
-					d = d + 4 * (ry*ry * (2*x + 3) + rx*rx* (-2*y + 2));
-					y = y - 1;
+					d += ((ryry * ((x<<1) + 3) + rxrx* (-(y<<1) + 2))<<2);
+					y --;
 				}
-				x = x + 1;
+				x ++;
 				putPixel(getCenter()[0] + x, getCenter()[1] + y);	
 				putPixel(getCenter()[0] - x, getCenter()[1] + y);	
 				putPixel(getCenter()[0] + x, getCenter()[1] - y);	
 				putPixel(getCenter()[0] - x, getCenter()[1] - y);	
 			}
 
-			d = ry*ry*(4*x*x+4*x+1) + rx*rx*(4*y*y-8*y+4)- 4*rx*rx *ry*ry;
+			d = ryry*( ((x*x+x)<<2) +1) + rxrx*( ((y*y-(y<<1))<<2) +4 )- ((rxrx*ryry) << 2);
 
 			while( y>0 ){
 				if( d<0 ){
-					d += 4 * (ry*ry*(2*x + 2) + rx*rx *(-2*y + 3));
+					d += (ryry*((x + 1)<<1) + rxrx *(-(y<<1) + 3)) << 2;
 					x++;
 				}else{
-					d += 4*rx*rx* (-2*y + 3);
+					d += (rxrx<<2)*(-(y<<1) + 3);
 				}
 				y--;
 				putPixel(getCenter()[0] + x, getCenter()[1] + y);	

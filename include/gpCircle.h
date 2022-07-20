@@ -89,9 +89,9 @@ class gpCircle : public gpShape{
 
 			while( point[1]>point[0] ){
 				if( d < 0 )
-					d = d + 2*point[0] + 3;
+					d = d + (point[0]<<1) + 3;
 				else{
-					d = d + 2 * (point[0] - point[1]) + 5;
+					d = d + ((point[0] - point[1])<<1) + 5;
 					point[1]--;
 				}
 				point[0]++;
@@ -106,8 +106,35 @@ class gpCircle : public gpShape{
 
 		}
 
-		void softwareRenderFill(){
+		static void draw(int center[2], int r){
 
+			int point[2] = {0, r};
+
+			int d = 1-r;
+
+			while( point[1]>=point[0] ){
+				
+				for(int i = -1; i<2; i+=2)
+					for(int j = -1; j<2; j+=2){
+						putPixel(center[0]+j*point[0], center[1]+i*point[1] );
+						putPixel(center[0]+j*point[1], center[1]+i*point[0] );
+					}
+
+				if( d < 0 )
+					d = d + (point[0]<<1) + 3;
+				else{
+					d = d + ((point[0] - point[1])<<1) + 5;
+					point[1]--;
+				}
+				point[0]++;
+				
+			}
+
+		}
+
+		void softwareRenderFill(){
+			for(int i = 0; i<r; i++)
+				gpCircle::draw( getCenter(), i);
 		}
 
 		bool onClick(int x, int y) 

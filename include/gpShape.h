@@ -9,6 +9,7 @@
 #define ROUNDNUM(x) ((int)( x >= .5f ? (x+1.0f) : x )) 
 #define MIN(x, y) ( x >= y ? y : x ) 
 #define MAX(x, y) ( x >= y ? x : y ) 
+#define ABS(x) ( x < 0 ? -x : x )
 
 using namespace std;
 
@@ -54,7 +55,7 @@ class gpShape
 			return vertex[2][i];
 		}
 
-		void putPixel(int x, int y){
+		static void putPixel(int x, int y){
 			
 			ImGuiIO& io = ImGui::GetIO();
 

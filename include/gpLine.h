@@ -105,9 +105,18 @@ class gpLine : public gpShape{
 
 		bool onClick(int x, int y) 
 		{
-			// determinar la distancia del click a la línea
-			// si es mejor a un umbral (e.g. 3 píxeles) entonces
-			// retornas true
+			int point[] = {x, y};
+			int sec_axis = (main_axis+1)&1;
+
+			if( vertex[0][main_axis] < vertex[1][main_axis] ){
+				if(vertex[0][main_axis] < point[main_axis] || vertex[1][main_axis] > point[main_axis] )
+					return false;
+			}else{
+				if(vertex[1][main_axis] < point[main_axis] || vertex[0][main_axis] > point[main_axis] )
+					return false;
+			}
+
+			
 			return false;
 		}
 
