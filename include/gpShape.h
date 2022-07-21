@@ -10,6 +10,8 @@
 #define MIN(x, y) ( x >= y ? y : x ) 
 #define MAX(x, y) ( x >= y ? x : y ) 
 #define ABS(x) ( x < 0 ? -x : x )
+#define MOD_INC(x, y) ( x+1 == y ? 0 : x+1 )
+#define MOD_DEC(x, y) ( x-1 < 0 ? y-1 : x-1 )
 
 using namespace std;
 

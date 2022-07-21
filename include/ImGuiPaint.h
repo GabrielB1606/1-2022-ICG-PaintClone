@@ -27,7 +27,6 @@ void ImGuiPaintMotionFunc(int x, int y){
     io.AddMousePosEvent((float)x, (float)y);
 }
 
-
 static void HelpMarker(const char* desc)
 {
     ImGui::TextDisabled("(?)");
