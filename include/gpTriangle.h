@@ -56,16 +56,20 @@ class gpTriangle : public gpShape{
 			glEnd();
 		}
 
-		void softwareRenderBorder(){
+		void hardwareRender(){
+			glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
+			hardwareRenderFill();
+			
+			glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
+			hardwareRenderBorder();
+		}
+
+		void softwareRender(){
 
             gpLine::draw( vertex[0][0], vertex[0][1], vertex[1][0], vertex[1][1], border_color );
             gpLine::draw( vertex[1][0], vertex[1][1], vertex[2][0], vertex[2][1], border_color );
             gpLine::draw( vertex[0][0], vertex[0][1], vertex[2][0], vertex[2][1], border_color );
 
-		}
-
-		void softwareRenderFill(){
-			
 		}
 
 		bool onClick(int x, int y) 

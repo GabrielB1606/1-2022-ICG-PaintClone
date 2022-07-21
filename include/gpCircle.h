@@ -81,45 +81,39 @@ class gpCircle : public gpShape{
 			glEnd();
 		}
 
-		void softwareRenderBorder(){
+		void hardwareRender(){
+			glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
+			hardwareRenderFill();
+			
+			glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
+			hardwareRenderBorder();
+		}
+
+		static void circlePoints(int x, int y, int center[2]){
+			int point[] = {x, y};
+			for(int i = -1; i<2; i+=2)
+				for(int j = -1; j<2; j+=2){
+					putPixel(center[0]+j*point[0], center[1]+i*point[1] );
+					putPixel(center[0]+j*point[1], center[1]+i*point[0] );
+				}
+		}
+
+		void softwareRender(){
 
 			int point[2] = {0, r};
 
 			int d = 1-r;
 
 			while( point[1]>point[0] ){
-				if( d < 0 )
-					d = d + (point[0]<<1) + 3;
-				else{
-					d = d + ((point[0] - point[1])<<1) + 5;
-					point[1]--;
-				}
-				point[0]++;
-
-				for(int i = -1; i<2; i+=2)
-					for(int j = -1; j<2; j+=2){
-						putPixel(getCenter()[0]+j*point[0], getCenter()[1]+i*point[1] );
-						putPixel(getCenter()[0]+j*point[1], getCenter()[1]+i*point[0] );
-					}
 				
-			}
+				glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
+				circlePoints(point[0], point[1], getCenter());
 
-		}
-
-		static void draw(int center[2], int r){
-
-			int point[2] = {0, r};
-
-			int d = 1-r;
-
-			while( point[1]>=point[0] ){
+				glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
+				for(int i = 0; i<point[1]; i++)
+					circlePoints(point[0], i, getCenter());
 				
-				for(int i = -1; i<2; i+=2)
-					for(int j = -1; j<2; j+=2){
-						putPixel(center[0]+j*point[0], center[1]+i*point[1] );
-						putPixel(center[0]+j*point[1], center[1]+i*point[0] );
-					}
-
+				
 				if( d < 0 )
 					d = d + (point[0]<<1) + 3;
 				else{
@@ -130,11 +124,6 @@ class gpCircle : public gpShape{
 				
 			}
 
-		}
-
-		void softwareRenderFill(){
-			for(int i = 0; i<r; i++)
-				gpCircle::draw( getCenter(), i);
 		}
 
 		bool onClick(int x, int y) 

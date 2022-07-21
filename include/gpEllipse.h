@@ -79,66 +79,22 @@ class gpEllipse : public gpShape{
 			glEnd();
 		}
 
-		static void draw(int center[2], int rx, int ry){
-			int x, y, d;
-			int rxrx = rx*rx;
-			int ryry = ry*ry;
-
-			x = 0;
-			y = ry;
-
-			d = ry * ((ry - rxrx)<<2) + rxrx;
-
-			while( ((ryry * (x + 1)) << 1) < rxrx * ((y<<1) - 1) ){
-				putPixel(center[0] + x, center[1] + y);	
-				putPixel(center[0] - x, center[1] + y);	
-				putPixel(center[0] + x, center[1] - y);	
-				putPixel(center[0] - x, center[1] - y);	
-				if(d < 0)
-					d += ((ryry * ((x<<1) + 3))<<2);
-				else {
-					d += ((ryry * ((x<<1) + 3) + rxrx* (-(y<<1) + 2))<<2);
-					y --;
-				}
-				x ++;
-			}
-
-			d = ryry*( ((x*x+x)<<2) +1) + rxrx*( ((y*y-(y<<1))<<2) +4 )- ((rxrx*ryry) << 2);
-
-			while( y>=0 ){
-				putPixel(center[0] + x, center[1] + y);	
-				putPixel(center[0] - x, center[1] + y);	
-				putPixel(center[0] + x, center[1] - y);	
-				putPixel(center[0] - x, center[1] - y);	
-				if( d<0 ){
-					d += (ryry*((x + 1)<<1) + rxrx *(-(y<<1) + 3)) << 2;
-					x++;
-				}else{
-					d += (rxrx<<2)*(-(y<<1) + 3);
-				}
-				y--;
-			}
+		void hardwareRender(){
+			glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
+			hardwareRenderFill();
+			
+			glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
+			hardwareRenderBorder();
+		}
+		
+		void ellipsePoints(int x, int y, int center[2]){
+			putPixel(center[0] + x, center[1] + y);	
+			putPixel(center[0] - x, center[1] + y);	
+			putPixel(center[0] + x, center[1] - y);	
+			putPixel(center[0] - x, center[1] - y);	
 		}
 
-		void softwareRenderFill(){
-
-			if( rx < ry ){
-				for(int i = 0; i<rx; i++)
-					gpCircle::draw(getCenter(), i);
-				
-				for(int i = rx; i<ry; i++)
-					gpEllipse::draw(getCenter(), rx, i);
-			}else{
-				for(int i = 0; i<ry; i++)
-					gpCircle::draw(getCenter(), i);
-				
-				for(int i = ry; i<rx; i++)
-					gpEllipse::draw(getCenter(), i, ry);
-			}
-
-		}
-
-		void softwareRenderBorder(){
+		void softwareRender(){
 
 			int x, y, d;
 
@@ -148,6 +104,14 @@ class gpEllipse : public gpShape{
 			d = ry * ((ry - rxrx)<<2) + rxrx;
 
 			while( ((ryry * (x + 1)) << 1) < rxrx * ((y<<1) - 1) ){
+
+				glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
+				ellipsePoints(x, y, getCenter());
+
+				glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
+				for(int i = 0; i<y; i++)
+					ellipsePoints(x, i, getCenter());
+					
 				if(d < 0)
 					d += ((ryry * ((x<<1) + 3))<<2);
 				else {
@@ -155,15 +119,20 @@ class gpEllipse : public gpShape{
 					y --;
 				}
 				x ++;
-				putPixel(getCenter()[0] + x, getCenter()[1] + y);	
-				putPixel(getCenter()[0] - x, getCenter()[1] + y);	
-				putPixel(getCenter()[0] + x, getCenter()[1] - y);	
-				putPixel(getCenter()[0] - x, getCenter()[1] - y);	
+
 			}
 
 			d = ryry*( ((x*x+x)<<2) +1) + rxrx*( ((y*y-(y<<1))<<2) +4 )- ((rxrx*ryry) << 2);
 
 			while( y>0 ){
+
+				glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
+				ellipsePoints(x, y, getCenter());
+
+				glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
+				for(int i = 0; i<y; i++)
+					ellipsePoints(x, i, getCenter());
+
 				if( d<0 ){
 					d += (ryry*((x + 1)<<1) + rxrx *(-(y<<1) + 3)) << 2;
 					x++;
@@ -171,10 +140,6 @@ class gpEllipse : public gpShape{
 					d += (rxrx<<2)*(-(y<<1) + 3);
 				}
 				y--;
-				putPixel(getCenter()[0] + x, getCenter()[1] + y);	
-				putPixel(getCenter()[0] - x, getCenter()[1] + y);	
-				putPixel(getCenter()[0] + x, getCenter()[1] - y);	
-				putPixel(getCenter()[0] - x, getCenter()[1] - y);	
 			}
 		}
 

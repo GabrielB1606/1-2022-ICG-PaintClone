@@ -56,11 +56,11 @@ class gpLine : public gpShape{
 			gpLine l(x0, y0);
 			l.setVertex(1, x1, y1);
 			l.setBorderColor(color);
-			l.softwareRenderBorder();
+			l.softwareRender();
 
 		}
 
-		void hardwareRenderBorder()
+		void hardwareRender()
 		{
 			// despliegas la línea con el algoritmo de bresenham
 			// setColor(color[0], color[1], color[2]);
@@ -73,9 +73,7 @@ class gpLine : public gpShape{
 			glEnd();
 		}
 
-		void hardwareRenderFill(){}
-
-		void softwareRenderBorder(){
+		void softwareRender(){
 			
 			glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
 
@@ -100,8 +98,6 @@ class gpLine : public gpShape{
 			}
 
 		}
-
-		void softwareRenderFill(){}
 
 		bool onClick(int x, int y) 
 		{

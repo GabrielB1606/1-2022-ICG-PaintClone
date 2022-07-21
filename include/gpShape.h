@@ -75,27 +75,17 @@ class gpShape
 		void setFillColor(ImVec4 fill_color){
 			this->fill_color = fill_color;
 		}
-
-		virtual void softwareRenderBorder() = 0;
-		virtual void softwareRenderFill() = 0;
 		
-		virtual void hardwareRenderBorder() = 0;
-		virtual void hardwareRenderFill() = 0;
+		virtual void hardwareRender() = 0;
+		virtual void softwareRender() = 0;
 		
 		void render(bool isHardwareMode){
-			glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
 
 			if(isHardwareMode)
-				hardwareRenderFill();
+				hardwareRender();
 			else
-				softwareRenderFill();
+				softwareRender();
 
-			glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
-
-			if(isHardwareMode)
-				hardwareRenderBorder();
-			else
-				softwareRenderBorder();
 		}
 
 		// recibe el click del mouse y retorna true si efectivamente

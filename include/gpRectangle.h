@@ -44,6 +44,14 @@ class gpRectangle : public gpShape{
 			glEnd();
 		}
 
+		void hardwareRender(){
+			glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
+			hardwareRenderFill();
+			
+			glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
+			hardwareRenderBorder();
+		}
+
         void setVertex(int n, int x, int y){
 
 			gpShape::setVertex(n,x,y);
@@ -55,9 +63,7 @@ class gpRectangle : public gpShape{
 
 		}
 
-        
-
-		void softwareRenderFill(){
+		void softwareRender(){
 
             int y0, y1;
 
@@ -69,33 +75,23 @@ class gpRectangle : public gpShape{
                 y0 = vertex[0][1];
             }
 
-            for(int i = vertex[0][0]; i<vertex[1][0]; i++)
-                for(int  j = y0; j<y1; j++)
-                    putPixel(i,j);
-
-		}
-
-		void softwareRenderBorder(){
-			
-			int y0, y1;
-
-            if( vertex[0][1] > vertex[1][1] ){
-                y0 = vertex[1][1];
-                y1 = vertex[0][1];
-            }else{
-                y1 = vertex[1][1];
-                y0 = vertex[0][1];
-            }
-
-			for(int i = vertex[0][0]; i<vertex[1][0]; i++){
-				putPixel(i, y0);
-				putPixel(i, y1);
-			}
-
-			for(int i = y0; i<y1; i++){
+			glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
+			for(int i = y0; i<=y1; i++){
 				putPixel(vertex[0][0], i);
 				putPixel(vertex[1][0], i);
 			}
+			y0++;
+			
+			for(int i = vertex[0][0]+1; i<vertex[1][0]; i++){
+				putPixel(i, vertex[0][1]);
+				putPixel(i, vertex[1][1]);
+			}
+
+			glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
+
+            for(int i = vertex[0][0]+1; i<vertex[1][0]; i++)
+                for(int  j = y0; j<y1; j++)
+                    putPixel(i,j);
 
 		}
 
