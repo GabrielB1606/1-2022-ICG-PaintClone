@@ -103,7 +103,6 @@ class gpTriangle : public gpShape{
 
 		void softwareRender(){
 
-			glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
 
 			float point[2][2] = {
 				{vertex[1][0], vertex[1][1]},
@@ -128,6 +127,10 @@ class gpTriangle : public gpShape{
 			unsigned char drawing = 0b11;
 
 			while( drawing ){
+				
+				gpLine::draw( point[0][0], point[0][1], point[1][0], point[1][1], fill_color );
+				
+				glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
 
 				if( (int)point[0][main_axis[0]] != (int)final[0] ){
 					putPixel( ROUNDNUM( point[0][0] ),  ROUNDNUM( point[0][1] ) );
@@ -145,8 +148,8 @@ class gpTriangle : public gpShape{
 					drawing &= 0b01;
 				}
 
-				gpLine::draw( point[0][0], point[0][1], point[1][0], point[1][1], fill_color );
 			}
+			gpLine::draw( point[0][0], point[0][1], point[1][0], point[1][1], border_color );
 		}
 
 		bool onClick(int x, int y) 
