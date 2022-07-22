@@ -100,26 +100,42 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
         return;
 
     if( state == GLUT_DOWN && glut_button == GLUT_LEFT_BUTTON ){
-        vertex_dragging = 1;
-        switch (current_shape){
-            case DrawLine:
-                current_drawing = new gpLine(x, y);
-                break;
-            case DrawRectangle:
-                current_drawing = new gpRectangle(x,y);
-                break;
-            case DrawTriangle:
-                current_drawing = new gpTriangle(x,y);
-                break;
-            case DrawCircle:
-                current_drawing = new gpCircle(x,y);
-                break;
-            case DrawEllipse:
-                current_drawing = new gpEllipse(x,y);
-                break;
 
-            default:
-                break;
+        if(vertice_mode && DrawTriangle == current_shape){
+            if(vertex_dragging == -1){
+                current_drawing = new gpTriangle(x,y);
+                vertex_dragging = 1;
+            }else if( vertex_dragging < 3 ){
+                current_drawing->setVertex(vertex_dragging, x, y);
+                vertex_dragging++;
+                if( vertex_dragging >= 3 ){
+                    shapes.emplace_back(current_drawing);
+                    vertex_dragging = -1;
+                }
+            }
+            
+        }else{
+            vertex_dragging = 1;
+            switch (current_shape){
+                case DrawLine:
+                    current_drawing = new gpLine(x, y);
+                    break;
+                case DrawRectangle:
+                    current_drawing = new gpRectangle(x,y);
+                    break;
+                case DrawTriangle:
+                    current_drawing = new gpTriangle(x,y);
+                    break;
+                case DrawCircle:
+                    current_drawing = new gpCircle(x,y);
+                    break;
+                case DrawEllipse:
+                    current_drawing = new gpEllipse(x,y);
+                    break;
+
+                default:
+                    break;
+            }
         }
         // if(center_mode)
         //     current_drawing->setCenter(x,y);
@@ -127,8 +143,10 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
         
     }else if( state == GLUT_UP ){
         // current_drawing->setVertex(vertex_dragging,x,y);
-        vertex_dragging = -1;
-        shapes.emplace_back(current_drawing);
+        if( !vertice_mode ){
+            vertex_dragging = -1;
+            shapes.emplace_back(current_drawing);
+        }
     }
     
 }
@@ -137,15 +155,35 @@ void GlutPaintMotionFunc(int x, int y){
 
     ImGuiIO& io = ImGui::GetIO();
     io.AddMousePosEvent((float)x, (float)y);
+    if( io.WantCaptureMouse )
+        return;
 
-    if( vertex_dragging != -1 ){
+    if( !vertice_mode && vertex_dragging != -1 ){
         current_drawing->setVertex(vertex_dragging, x, y);
     }
+}
+
+void GlutPaintPassiveMotionFunc(int x, int y){
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.AddMousePosEvent((float)x, (float)y);
+    if( io.WantCaptureMouse )
+        return;
+
+    if(  vertex_dragging != -1 && vertice_mode){
+        if( current_shape == DrawTriangle && current_drawing != nullptr && vertex_dragging < 3 ){
+            for(int i = vertex_dragging; i<3; i++)
+                current_drawing->setVertex(i, x, y);
+        }
+
+    }
+
 }
 
 void GlutPaintInstallFuncs(){
     glutMouseFunc(GlutPaintMouseFunc);
     glutMotionFunc(GlutPaintMotionFunc);
+    glutPassiveMotionFunc( GlutPaintPassiveMotionFunc );
 }
 
 void GlutPaintCleanup(){

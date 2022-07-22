@@ -105,13 +105,13 @@ class gpTriangle : public gpShape{
 
 
 			float point[2][2] = {
-				{vertex[1][0], vertex[1][1]},
-				{vertex[1][0], vertex[1][1]}
+				{(float)vertex[1][0], (float)vertex[1][1]},
+				{(float)vertex[1][0], (float)vertex[1][1]}
 			};
 
 			float final[2] = {
-				vertex[0][main_axis[0]],
-				vertex[2][main_axis[1]]
+				(float)vertex[0][main_axis[0]],
+				(float)vertex[2][main_axis[1]]
 			};
 
 			int sec_axis[2] = {

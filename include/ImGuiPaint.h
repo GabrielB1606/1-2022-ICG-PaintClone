@@ -58,6 +58,19 @@ void ImGuiPaintDisplay(){
         ImGui::Separator();
         ImGui::Text("Draw");
 
+        ImGui::Text("Shape");
+        ImGui::SameLine();
+        HelpMarker("Ayuda");
+        const char* shapes[] = { 
+            "Line",
+            "Circle",
+            "Ellipse",
+            "Rectangle",
+            "Triangle",
+            "Bezier Curve"
+        };
+        ImGui::ListBox(" ", &current_shape, shapes, IM_ARRAYSIZE(shapes), 6);
+
         ImGui::Checkbox("Center Mode", &center_mode);
         ImGui::SameLine();
         HelpMarker("The first point given will be taken as the center.\n\n(Drag while pressing Alt)");
@@ -72,19 +85,6 @@ void ImGuiPaintDisplay(){
             default:
                 break;
         }
-
-        ImGui::Text("Shape");
-        ImGui::SameLine();
-        HelpMarker("Ayuda");
-        const char* shapes[] = { 
-            "Line",
-            "Circle",
-            "Ellipse",
-            "Rectangle",
-            "Triangle",
-            "Bezier Curve"
-        };
-        ImGui::ListBox(" ", &current_shape, shapes, IM_ARRAYSIZE(shapes), 6);
 
         ImGui::Text("Colors");
 
