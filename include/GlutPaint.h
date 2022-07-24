@@ -100,6 +100,9 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
     if( io.WantCaptureMouse )
         return;
 
+    mouse_pos[0] = x;
+    mouse_pos[1] = y;
+
     // Selection Mode click
     if( selection_mode ){
 
@@ -193,13 +196,18 @@ void GlutPaintMotionFunc(int x, int y){
     if( io.WantCaptureMouse )
         return;
 
+    if( current_drawing == nullptr )
+        return;
+
     if( selection_mode ){
-        // current_drawing-
+        current_drawing->onMove(x, y);
     }
 
     if( !vertice_mode && vertex_dragging != -1 ){
         current_drawing->setVertex(vertex_dragging, x, y);
     }
+    mouse_pos[0] = x;
+    mouse_pos[1] = y;
 }
 
 void GlutPaintPassiveMotionFunc(int x, int y){

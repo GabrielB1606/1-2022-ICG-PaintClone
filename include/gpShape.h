@@ -18,6 +18,7 @@ using namespace std;
 static short vertex_dragging = -1;
 static bool center_mode = false;
 static bool vertice_mode = false;
+static int mouse_pos[2] = {0, 0};
 
 class gpShape
 {
@@ -153,6 +154,25 @@ class gpShape
 			vertex[2][1] = y;
 		}
 		
+		void onMove(int x, int y){
+			
+			if( onClick(x, y) && selected ){
+				
+				int diff[2] = {x - mouse_pos[0], y - mouse_pos[1]};
+
+				for(int i =0; i<3; i++){
+					vertex[i][0] += diff[0];
+					vertex[i][1] += diff[1];
+				}
+				for(int i = 0; i< 2; i++){
+					bounding_box[i][0] += diff[0];
+					bounding_box[i][1] += diff[1];
+				}
+				// printf("%f %f\n", io.MouseDelta.x, io.MouseDelta.y);
+			}
+
+		}
+
 		float Q_rsqrt( float number ){
 			long i;
 			float x2, y;
