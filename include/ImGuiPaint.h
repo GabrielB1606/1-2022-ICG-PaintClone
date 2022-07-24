@@ -56,6 +56,13 @@ void ImGuiPaintDisplay(){
         ImGui::Checkbox("Hardware Mode", &hardware_mode);
 
         ImGui::Separator();
+        ImGui::Text("Tools");
+        ImGui::Checkbox("Selection Mode", &selection_mode);
+
+        if(ImGui::Button("Delete"))
+            deleteCurrent();
+
+        ImGui::Separator();
         ImGui::Text("Draw");
 
         ImGui::Text("Shape");

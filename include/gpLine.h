@@ -29,10 +29,10 @@ class gpLine : public gpShape{
 
 		bool updateSlope(){
 	
-			// if( vertex[0][main_axis] > vertex[1][main_axis] ){
-			// 	swap( vertex[0], vertex[1] );
-			// 	vertex_dragging = (vertex_dragging + 1)&1;
-			// }
+			if( vertex[0][main_axis] > vertex[1][main_axis] ){
+				swap( vertex[0], vertex[1] );
+				vertex_dragging = (vertex_dragging + 1)&1;
+			}
 
 			int sec_axis = (main_axis+1)&1;
 			m = (float)(vertex[1][sec_axis] - vertex[0][sec_axis])/(vertex[1][main_axis] - vertex[0][main_axis]);
@@ -80,15 +80,15 @@ class gpLine : public gpShape{
 			float point[2];
 			float final;
 
-			if(vertex[0][main_axis] < vertex[1][main_axis]){
+			// if(vertex[0][main_axis] < vertex[1][main_axis]){
 				point[0] = (float)vertex[0][0];
 				point[1] = (float)vertex[0][1];
 				final = (float)vertex[1][main_axis];
-			}else{
-				final = (float)vertex[0][main_axis];
-				point[0] = (float)vertex[1][0];
-				point[1] = (float)vertex[1][1];
-			}
+			// }else{
+			// 	final = (float)vertex[0][main_axis];
+			// 	point[0] = (float)vertex[1][0];
+			// 	point[1] = (float)vertex[1][1];
+			// }
 
 			int sec_axis = (main_axis+1)&1;
 
@@ -102,22 +102,44 @@ class gpLine : public gpShape{
 		bool onClick(int x, int y) 
 		{
 			int point[] = {x, y};
+
+			if(point[main_axis]+5 < vertex[0][main_axis] || point[main_axis]-5 > vertex[1][main_axis]  )
+				return false;
+
 			int sec_axis = (main_axis+1)&1;
 
-			if( vertex[0][main_axis] < vertex[1][main_axis] ){
-				if(vertex[0][main_axis] < point[main_axis] || vertex[1][main_axis] > point[main_axis] )
-					return false;
-			}else{
-				if(vertex[1][main_axis] < point[main_axis] || vertex[0][main_axis] > point[main_axis] )
-					return false;
-			}
+			int b = vertex[1][sec_axis] - m*vertex[1][main_axis];
+			int should_be = point[main_axis]*m + b;
 
+			int d = should_be - point[sec_axis];
+
+			// int d = (int)ABS( ((int)m*point[main_axis] + b - point[sec_axis]) ) * Q_rsqrt( (m*m) + 1 );
+
+			// double m = ( vertex[1][1] - vertex[0][1])/ ( vertex[1][0] - vertex[0][0] );
+			// double b = vertex[1][1] - m*vertex[1][0];
+			// double d = ABS( (m*x-y+b) )/sqrt((m*m)+1);
+
+			cout << ABS(d) << "\n";
 			
-			return false;
+			return ABS(d) <= 5;
+			
+		}
+
+		void renderBoundingBox(){
+			glColor3f(70, 70, 70);
+			for(int x = -3; x<=3; x++)
+				for(int y = -3; y<=3; y++){
+					putPixel( vertex[0][0]+x, vertex[0][1]+y );
+					putPixel( vertex[1][0]+x, vertex[1][1]+y );
+				}
 		}
 
 		void onMove(int x, int y)
 		{
+		}
+
+		void select(bool s){
+			selected = s;
 		}
 
 };

@@ -26,6 +26,13 @@ class gpRectangle : public gpShape{
 		// 	this->y1 = y1;
 		// }
 
+		static void draw(int x0, int y0, int x1, int y1, ImVec4 color){
+			glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
+			for(int i = x0; i<x1; i++)
+				for(int j = y0; j<y1; j++)
+					putPixel(i,j);
+		}
+
 		void hardwareRenderFill(){
 			glBegin(GL_QUADS);
 				glVertex2i(vertex[0][0], window_height -vertex[0][1]);
@@ -95,17 +102,17 @@ class gpRectangle : public gpShape{
 
 		}
 
-		bool onClick(int x, int y) 
-		{
-			// determinar la distancia del click a la línea
-			// si es mejor a un umbral (e.g. 3 píxeles) entonces
-			// retornas true
-			return false;
+		bool onClick(int x, int y) {
+			return x >= MIN(vertex[0][0], vertex[1][0]) && x <= MAX(vertex[0][0], vertex[1][0]) &&y >= MIN(vertex[0][1], vertex[1][1]) && y <= MAX(vertex[0][1], vertex[1][1]);
 		}
 
 		void onMove(int x, int y)
 		{
 		}
+
+		// void select(bool s){
+
+		// }
 
 };
 

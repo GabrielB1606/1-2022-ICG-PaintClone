@@ -143,17 +143,19 @@ class gpEllipse : public gpShape{
 			}
 		}
 
-		bool onClick(int x, int y) 
-		{
-			// determinar la distancia del click a la línea
-			// si es mejor a un umbral (e.g. 3 píxeles) entonces
-			// retornas true
-			return false;
+		bool onClick(int x, int y){
+			
+			int x_h = x-getCenter()[0];
+			int y_k = y-getCenter()[1];
+
+			int d = (x_h*x_h/rxrx) + (y_k *y_k/ryry);
+
+			return !d;
 		}
 
-		void onMove(int x, int y)
-		{
+		void onMove(int x, int y){
 		}
+
 
 };
 

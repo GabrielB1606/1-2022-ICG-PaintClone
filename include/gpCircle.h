@@ -84,7 +84,7 @@ class gpCircle : public gpShape{
 		void hardwareRender(){
 			glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
 			hardwareRenderFill();
-			
+
 			glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
 			hardwareRenderBorder();
 		}
@@ -97,6 +97,10 @@ class gpCircle : public gpShape{
 					putPixel(center[0]+j*point[1], center[1]+i*point[0] );
 				}
 		}
+
+		// void select(bool s){
+
+		// }
 
 		void softwareRender(){
 
@@ -128,10 +132,10 @@ class gpCircle : public gpShape{
 
 		bool onClick(int x, int y) 
 		{
-			// determinar la distancia del click a la línea
-			// si es mejor a un umbral (e.g. 3 píxeles) entonces
-			// retornas true
-			return false;
+			int dx = getCenter(0) - x;
+			int dy = getCenter(1) - y;
+
+			return (dx*dx + dy*dy) <= (r*r);
 		}
 
 		void onMove(int x, int y)

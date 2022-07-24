@@ -25,6 +25,8 @@ class gpShape
 	protected:
 		ImVec4 border_color, fill_color;
 		int vertex[3][2];
+		int bounding_box[2][2];
+		bool selected = false;
 
 	public:
 
@@ -81,6 +83,30 @@ class gpShape
 		virtual void hardwareRender() = 0;
 		virtual void softwareRender() = 0;
 		
+		// recibe el click del mouse y retorna true si efectivamente
+		// el objetos fue seleccionado
+		virtual bool onClick(int x, int y) = 0;
+		
+		void select(bool s){
+			bounding_box[0][0] = MIN(vertex[0][0], vertex[1][0]);
+			bounding_box[0][1] = MIN(vertex[0][1], vertex[1][1]);
+			bounding_box[1][0] = MAX(vertex[0][0], vertex[1][0]);
+			bounding_box[1][1] = MAX(vertex[0][1], vertex[1][1]);
+			
+			selected = s;
+		}
+
+		virtual void renderBoundingBox(){
+
+			glColor3f(70, 70, 70);
+			for(int i = 0; i<2; i++)
+				for(int j = 0; j<2; j++)
+					for(int x = -3; x<=3; x++)
+						for(int y = -3; y<=3; y++)
+							putPixel( bounding_box[i][0]+x, bounding_box[j][1]+y );
+
+		}
+
 		void render(bool isHardwareMode){
 
 			if(isHardwareMode)
@@ -88,11 +114,11 @@ class gpShape
 			else
 				softwareRender();
 
+			if( selected )
+				renderBoundingBox();
+
 		}
 
-		// recibe el click del mouse y retorna true si efectivamente
-		// el objetos fue seleccionado
-		// virtual bool onClick(int x, int y);
 		
 		// // este método es invocado solo hacia el objeto "current"
 		// virtual void onMove(int x, int y);
@@ -107,8 +133,10 @@ class gpShape
 
 		// virtual void setVertex(int n, int x, int y) = 0;
 		virtual void setVertex(int n, int x, int y){
+
 			vertex[n][0] = x;
 			vertex[n][1] = y;
+			
 
 			if( !center_mode ){
 				vertex[2][0] = (vertex[0][0]+vertex[1][0]) >> 1;
@@ -125,6 +153,22 @@ class gpShape
 			vertex[2][1] = y;
 		}
 		
+		float Q_rsqrt( float number ){
+			long i;
+			float x2, y;
+			const float threehalfs = 1.5F;
+
+			x2 = number * 0.5F;
+			y = number;
+			i = *(long*) &y;					//	evil floating point bit hack
+			i = 0x5f3759df - (i>>1);			//	what the fuck?
+			y = *(float *) &i;
+			y = y * (threehalfs - (x2*y*y));	//	1st iteration
+			y = y * (threehalfs - (x2*y*y));	//	2nd iteration, can be removed
+
+			return y;
+
+		}
 
 		// podríamos responder a los eventos del mouse
 		// . todos responden al click, pero solo uno puede

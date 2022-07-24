@@ -31,6 +31,7 @@ gpShape* current_drawing = nullptr;
 
 // drawing modes
 static bool hardware_mode = true;
+static bool selection_mode = false;
 
 void GlutPaintInit();
 void GlutPaintDisplay();
@@ -99,48 +100,82 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
     if( io.WantCaptureMouse )
         return;
 
-    if( state == GLUT_DOWN && glut_button == GLUT_LEFT_BUTTON ){
+    // Selection Mode click
+    if( selection_mode ){
 
-        if(vertice_mode && DrawTriangle == current_shape){
-            if(vertex_dragging == -1){
-                current_drawing = new gpTriangle(x,y);
-                vertex_dragging = 1;
-            }else if( vertex_dragging < 3 ){
-                current_drawing->setVertex(vertex_dragging, x, y);
-                vertex_dragging++;
-                if( vertex_dragging >= 3 ){
+        if( state == GLUT_DOWN && glut_button == GLUT_LEFT_BUTTON ){
+            for(int i = shapes.size()-1; i>=0; i--)
+                if( shapes[i]->onClick(x, y) ){
+                    
+                    if( current_drawing != nullptr )
+                        current_drawing->select(false);
+                    
+                    current_drawing = shapes[i];
+                    current_drawing->select(true);
+                    shapes.erase( shapes.begin() + i );
                     shapes.emplace_back(current_drawing);
-                    vertex_dragging = -1;
+                    std::cout << "yo\n";
+                    return;
                 }
-            }
-            
-        }else{
-            vertex_dragging = 1;
-            switch (current_shape){
-                case DrawLine:
-                    current_drawing = new gpLine(x, y);
-                    break;
-                case DrawRectangle:
-                    current_drawing = new gpRectangle(x,y);
-                    break;
-                case DrawTriangle:
-                    current_drawing = new gpTriangle(x,y);
-                    break;
-                case DrawCircle:
-                    current_drawing = new gpCircle(x,y);
-                    break;
-                case DrawEllipse:
-                    current_drawing = new gpEllipse(x,y);
-                    break;
-
-                default:
-                    break;
+            if(current_drawing != nullptr){
+                current_drawing->select(false);
+                current_drawing = nullptr;
             }
         }
-        // if(center_mode)
-        //     current_drawing->setCenter(x,y);
-        // fill_color = current_drawing->getColorReference();
-        
+
+        return;
+    }
+
+    // Drawing Mode click (not selection)
+    if( state == GLUT_DOWN && glut_button == GLUT_LEFT_BUTTON ){
+        if( glut_button == GLUT_LEFT_BUTTON ){
+
+            if(vertice_mode && DrawTriangle == current_shape){
+                if(vertex_dragging == -1){
+                    current_drawing = new gpTriangle(x, y);
+                    vertex_dragging = 1;
+                }else if( vertex_dragging < 3 ){
+                    current_drawing->setVertex(vertex_dragging, x, y);
+                    vertex_dragging++;
+                    if( vertex_dragging >= 3 ){
+                        shapes.emplace_back(current_drawing);
+                        vertex_dragging = -1;
+                    }
+                }
+                
+            }else{
+                
+                vertex_dragging = 1;
+                switch (current_shape){
+                    case DrawTriangle:
+                        current_drawing = new gpTriangle(x,y);
+                        break;
+                    case DrawLine:
+                        vertice_mode = false;
+                        current_drawing = new gpLine(x, y);
+                        break;
+                    case DrawRectangle:
+                        vertice_mode = false;
+                        current_drawing = new gpRectangle(x,y);
+                        break;
+                    case DrawCircle:
+                        vertice_mode = false;
+                        current_drawing = new gpCircle(x,y);
+                        break;
+                    case DrawEllipse:
+                        vertice_mode = false;
+                        current_drawing = new gpEllipse(x,y);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            // if(center_mode)
+            //     current_drawing->setCenter(x,y);
+            // fill_color = current_drawing->getColorReference();
+
+        }
     }else if( state == GLUT_UP ){
         // current_drawing->setVertex(vertex_dragging,x,y);
         if( !vertice_mode ){
@@ -157,6 +192,10 @@ void GlutPaintMotionFunc(int x, int y){
     io.AddMousePosEvent((float)x, (float)y);
     if( io.WantCaptureMouse )
         return;
+
+    if( selection_mode ){
+        // current_drawing-
+    }
 
     if( !vertice_mode && vertex_dragging != -1 ){
         current_drawing->setVertex(vertex_dragging, x, y);
@@ -190,6 +229,17 @@ void GlutPaintCleanup(){
 
     for(gpShape* shape: shapes)
         delete shape;
+
+}
+
+void deleteCurrent(){
+
+    if( shapes.size() ){
+        current_drawing = shapes.back();
+        shapes.pop_back();
+        delete current_drawing;
+        current_drawing = nullptr;
+    }
 
 }
 

@@ -28,7 +28,7 @@ class gpTriangle : public gpShape{
 
 			int sec_axis = (main_axis[n]+1)&1;
 			
-			float denominador = (vertex[dest][main_axis[n]] - vertex[n][main_axis[n]]);
+			float denominador = (float)(vertex[dest][main_axis[n]] - vertex[n][main_axis[n]]);
 
 			if( denominador != 0 )
 				m[n] = (float)(vertex[dest][sec_axis] - vertex[n][sec_axis])/denominador;
@@ -40,7 +40,7 @@ class gpTriangle : public gpShape{
 				int sw = main_axis[n];
 				main_axis[n] = sec_axis;
 				sec_axis = sw;
-				denominador = (vertex[dest][main_axis[n]] - vertex[n][main_axis[n]]);
+				denominador = (float)(vertex[dest][main_axis[n]] - vertex[n][main_axis[n]]);
 
 				if( denominador != 0 )
 					m[n] = (float)(vertex[dest][sec_axis] - vertex[n][sec_axis])/denominador;
@@ -101,8 +101,17 @@ class gpTriangle : public gpShape{
 			hardwareRenderBorder();
 		}
 
-		void softwareRender(){
+		void renderBoundingBox(){
 
+			glColor3f(70, 70, 70);
+			for(int i = 0; i<3; i++)
+				for(int x = -3; x<=3; x++)
+					for(int y = -3; y<=3; y++)
+						putPixel( vertex[i][0]+x, vertex[i][1]+y );
+
+		}
+
+		void softwareRender(){
 
 			float point[2][2] = {
 				{(float)vertex[1][0], (float)vertex[1][1]},
@@ -128,7 +137,7 @@ class gpTriangle : public gpShape{
 
 			while( drawing ){
 				
-				gpLine::draw( point[0][0], point[0][1], point[1][0], point[1][1], fill_color );
+				gpLine::draw( (int)point[0][0], (int)point[0][1], (int)point[1][0], (int)point[1][1], fill_color );
 				
 				glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
 
@@ -149,20 +158,40 @@ class gpTriangle : public gpShape{
 				}
 
 			}
-			gpLine::draw( point[0][0], point[0][1], point[1][0], point[1][1], border_color );
+			gpLine::draw( (int)point[0][0], (int)point[0][1], (int)point[1][0], (int)point[1][1], border_color );
+		}
+
+		int areaTimes2(int x1, int y1,int x2, int y2,int x3, int y3){
+			int area = x1*(y2-y3) + x2*(y3-y1)+ x3*(y1-y2);
+			return ABS(area);
 		}
 
 		bool onClick(int x, int y) 
 		{
-			// determinar la distancia del click a la línea
-			// si es mejor a un umbral (e.g. 3 píxeles) entonces
-			// retornas true
-			return false;
+			
+			int area_ABC = areaTimes2( vertex[0][0], vertex[0][1], vertex[1][0], vertex[1][1], vertex[2][0], vertex[2][1] );
+			
+			int area_PBC = areaTimes2( x, y, vertex[1][0], vertex[1][1], vertex[2][0], vertex[2][1] );
+			
+			int area_PAC = areaTimes2( vertex[0][0], vertex[0][1], x, y, vertex[2][0], vertex[2][1] );
+			
+			int area_PAB = areaTimes2( vertex[0][0], vertex[0][1], vertex[1][0], vertex[1][1], x, y );
+
+			// printf("%f = %f + %f + %f\n",area_ABC, area_PBC, area_PAC, area_PAB);
+
+			area_ABC -= ( ABS(area_PBC) + ABS(area_PAC) + ABS(area_PAB) );
+			
+			// printf(" = %f \n",area_ABC);
+
+			return area_ABC == 0;
 		}
 
-		void onMove(int x, int y)
-		{
-		}
+		// void onMove(int x, int y){
+		// }
+
+		// void select(bool s){
+
+		// }
 
 };
 
