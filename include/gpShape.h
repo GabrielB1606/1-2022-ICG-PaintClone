@@ -134,7 +134,6 @@ class gpShape
 
 		// virtual void setVertex(int n, int x, int y) = 0;
 		virtual void setVertex(int n, int x, int y){
-
 			vertex[n][0] = x;
 			vertex[n][1] = y;
 			

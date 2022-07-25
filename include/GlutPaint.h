@@ -74,14 +74,29 @@ void GlutPaintDisplay(){
     // tr.setFillColor( ImVec4(255, 255, 255, 1) );
     // tr.softwareRender();
 
-    gpBezier test(300, 300);
-    test.setVertex(1, 500, 500);
-    test.setVertex(2, 700, 300);
-    test.setBorderColor( border_color );
-    test.setFillColor( fill_color );
-    test.softwareRender();
+    // glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
+    //     glBegin( GL_LINE_STRIP );
+    //     glVertex2i(  300, 300 );
+    //     glVertex2i(  500, 500 );
+    //     glVertex2i(  700, 300 );
+    //     glEnd();
+
+    // gpBezier test(300, 300);
+    // test.setVertex(1, 500, 500);
+    // test.setVertex(2, 700, 300);
+    // test.setVertex(3, 800, 700);
+    // test.setVertex(4, 900, 715);
+    // test.setVertex(5, 1000, 650);
+    // test.setVertex(6, 800, 675);
+    // test.setVertex(7, 700, 700);
+    // test.setVertex(8, 600, 600);
+    // test.setVertex(9, 500, 500);
+    // test.setBorderColor( border_color );
+    // test.setFillColor( fill_color );
+    // test.softwareRender();
+
     // glBegin(GL_TRIANGLES);
-    //     glColor3f(1,0,0);
+    //     glColor3f(2,0,0);
     //     glVertex3f(300, 300, 0);
         
     //     glColor3f(0,1,0);
@@ -145,10 +160,26 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
     }
 
     // Drawing Mode click (not selection)
-    if( state == GLUT_DOWN && glut_button == GLUT_LEFT_BUTTON ){
+    if( state == GLUT_DOWN ){
         if( glut_button == GLUT_LEFT_BUTTON ){
 
-            if( vertice_mode ){
+            if( DrawBezier == current_shape ){
+
+                if(vertex_dragging == -1){
+                    current_drawing = new gpBezier(x, y);
+                    vertex_dragging = 1;
+                }else if( vertex_dragging < 20 ){
+                    current_drawing->setVertex(vertex_dragging, x, y);
+                    vertex_dragging++;
+                    if( vertex_dragging >= 20 ){
+                        shapes.emplace_back(current_drawing);
+                        vertex_dragging = -1;
+                    }
+                }
+                
+                return;
+
+            }else if( vertice_mode ){
 
                 if(DrawTriangle == current_shape){
                     if(vertex_dragging == -1){
@@ -158,18 +189,6 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
                         current_drawing->setVertex(vertex_dragging, x, y);
                         vertex_dragging++;
                         if( vertex_dragging >= 3 ){
-                            shapes.emplace_back(current_drawing);
-                            vertex_dragging = -1;
-                        }
-                    }
-                }else if( DrawBezier == current_shape ){
-                    if(vertex_dragging == -1){
-                        current_drawing = new gpBezier(x, y);
-                        vertex_dragging = 1;
-                    }else if( vertex_dragging < 20 ){
-                        current_drawing->setVertex(vertex_dragging, x, y);
-                        vertex_dragging++;
-                        if( vertex_dragging >= 20 ){
                             shapes.emplace_back(current_drawing);
                             vertex_dragging = -1;
                         }
@@ -199,10 +218,6 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
                         vertice_mode = false;
                         current_drawing = new gpEllipse(x,y);
                         break;
-                    case DrawBezier:
-                        vertice_mode = true;
-                        current_drawing = new gpBezier(x,y);
-                        break;
 
                     default:
                         break;
@@ -212,10 +227,14 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
             //     current_drawing->setCenter(x,y);
             // fill_color = current_drawing->getColorReference();
 
+        }else if( glut_button == GLUT_RIGHT_BUTTON && DrawBezier == current_shape ){
+            vertex_dragging = -1;
+            shapes.emplace_back(current_drawing);
         }
+
     }else if( state == GLUT_UP ){
         // current_drawing->setVertex(vertex_dragging,x,y);
-        if( !vertice_mode ){
+        if( !vertice_mode && current_shape != DrawBezier ){
             vertex_dragging = -1;
             shapes.emplace_back(current_drawing);
         }
@@ -237,7 +256,7 @@ void GlutPaintMotionFunc(int x, int y){
         current_drawing->onMove(x, y);
     }
 
-    if( !vertice_mode && vertex_dragging != -1 ){
+    if( current_shape != DrawBezier && !vertice_mode && vertex_dragging != -1 ){
         current_drawing->setVertex(vertex_dragging, x, y);
     }
     mouse_pos[0] = x;
@@ -250,16 +269,17 @@ void GlutPaintPassiveMotionFunc(int x, int y){
     io.AddMousePosEvent((float)x, (float)y);
     if( io.WantCaptureMouse )
         return;
+    if( vertex_dragging != -1 && current_drawing != nullptr )
+        if(  vertice_mode ){
+            if( current_shape == DrawTriangle && vertex_dragging < 3 ){
+                for(int i = vertex_dragging; i<3; i++)
+                    current_drawing->setVertex(i, x, y);
+            }
 
-    if(  vertex_dragging != -1 && vertice_mode && current_drawing != nullptr){
-        if( current_shape == DrawTriangle && vertex_dragging < 3 ){
-            for(int i = vertex_dragging; i<3; i++)
-                current_drawing->setVertex(i, x, y);
         }else if( current_shape == DrawBezier && vertex_dragging < 20 ){
             current_drawing->setVertex(vertex_dragging, x, y);
+            // printf("hey");
         }
-
-    }
 
 }
 
