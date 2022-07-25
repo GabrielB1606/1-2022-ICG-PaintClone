@@ -63,7 +63,7 @@ void ImGuiPaintDisplay(){
             deleteCurrent();
 
         ImGui::Separator();
-        ImGui::Text("Draw");
+        // ImGui::Text("Draw");
 
         ImGui::Text("Shape");
         ImGui::SameLine();
@@ -78,19 +78,25 @@ void ImGuiPaintDisplay(){
         };
         ImGui::ListBox(" ", &current_shape, shapes, IM_ARRAYSIZE(shapes), 6);
 
-        ImGui::Checkbox("Center Mode", &center_mode);
-        ImGui::SameLine();
-        HelpMarker("The first point given will be taken as the center.\n\n(Drag while pressing Alt)");
+        ImGui::Separator();
+        ImGui::Text("Properties");
 
-        switch (current_shape){
-            case DrawTriangle:
-                ImGui::Checkbox("Vertice Mode", &vertice_mode);
-                ImGui::SameLine();
-                HelpMarker("Click three times to define the position of each vertex.");
-                break;
 
-            default:
-                break;
+        if( current_shape != DrawBezier ){
+            ImGui::Checkbox("Center Mode", &center_mode);
+            ImGui::SameLine();
+            HelpMarker("The first point given will be taken as the center.\n\n(Drag while pressing Alt)");
+        }else{
+            if(ImGui::SliderFloat("t", &t_val, 0.001f, 0.5f) && current_drawing!= nullptr)            // Edit 1 float using a slider from 0.0f to 1.0f
+                ((gpBezier*)current_drawing)->setT(t_val);
+            ImGui::SameLine();
+            HelpMarker("Value of variable t. A smaller t implies a smoother curve with a penalty in performance.");
+        }
+
+        if( current_shape == DrawTriangle ){
+            ImGui::Checkbox("Vertice Mode", &vertice_mode);
+            ImGui::SameLine();
+            HelpMarker("Click three times to define the position of each vertex.");
         }
 
         ImGui::Text("Colors");
