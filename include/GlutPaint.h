@@ -16,6 +16,7 @@ static int window_width = 1280, window_height = 720;
 #include "gpTriangle.h"
 #include "gpCircle.h"
 #include "gpEllipse.h"
+#include "gpBezier.h"
 
 // window global variables
 
@@ -65,16 +66,30 @@ void GlutPaintDisplay(){
 
     // glClearColor(1, 1, 1, 1);
     glClear(GL_COLOR_BUFFER_BIT);
-    glBegin(GL_TRIANGLES);
-        glColor3f(1,0,0);
-        glVertex3f(100, 100, 0);
+
+    // gpTriangle tr(300, 300);
+    // tr.setVertex(1, 700, 300);
+    // tr.setVertex(2, 500, 500);
+    // tr.setBorderColor( border_color );
+    // tr.setFillColor( ImVec4(255, 255, 255, 1) );
+    // tr.softwareRender();
+
+    gpBezier test(300, 300);
+    test.setVertex(1, 500, 500);
+    test.setVertex(2, 700, 300);
+    test.setBorderColor( border_color );
+    test.setFillColor( fill_color );
+    test.softwareRender();
+    // glBegin(GL_TRIANGLES);
+    //     glColor3f(1,0,0);
+    //     glVertex3f(300, 300, 0);
         
-        glColor3f(0,1,0);
-        glVertex3f( 200, 100, 0);
+    //     glColor3f(0,1,0);
+    //     glVertex3f( 700, 300, 0);
         
-        glColor3f(0,0,1);
-        glVertex3f( 150,  200, 0);
-    glEnd();
+    //     glColor3f(0,0,1);
+    //     glVertex3f( 500,  500, 0);
+    // glEnd();
     glFlush();
 
     if( current_drawing != nullptr ){
@@ -133,16 +148,31 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
     if( state == GLUT_DOWN && glut_button == GLUT_LEFT_BUTTON ){
         if( glut_button == GLUT_LEFT_BUTTON ){
 
-            if(vertice_mode && DrawTriangle == current_shape){
-                if(vertex_dragging == -1){
-                    current_drawing = new gpTriangle(x, y);
-                    vertex_dragging = 1;
-                }else if( vertex_dragging < 3 ){
-                    current_drawing->setVertex(vertex_dragging, x, y);
-                    vertex_dragging++;
-                    if( vertex_dragging >= 3 ){
-                        shapes.emplace_back(current_drawing);
-                        vertex_dragging = -1;
+            if( vertice_mode ){
+
+                if(DrawTriangle == current_shape){
+                    if(vertex_dragging == -1){
+                        current_drawing = new gpTriangle(x, y);
+                        vertex_dragging = 1;
+                    }else if( vertex_dragging < 3 ){
+                        current_drawing->setVertex(vertex_dragging, x, y);
+                        vertex_dragging++;
+                        if( vertex_dragging >= 3 ){
+                            shapes.emplace_back(current_drawing);
+                            vertex_dragging = -1;
+                        }
+                    }
+                }else if( DrawBezier == current_shape ){
+                    if(vertex_dragging == -1){
+                        current_drawing = new gpBezier(x, y);
+                        vertex_dragging = 1;
+                    }else if( vertex_dragging < 20 ){
+                        current_drawing->setVertex(vertex_dragging, x, y);
+                        vertex_dragging++;
+                        if( vertex_dragging >= 20 ){
+                            shapes.emplace_back(current_drawing);
+                            vertex_dragging = -1;
+                        }
                     }
                 }
                 
@@ -168,6 +198,10 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
                     case DrawEllipse:
                         vertice_mode = false;
                         current_drawing = new gpEllipse(x,y);
+                        break;
+                    case DrawBezier:
+                        vertice_mode = true;
+                        current_drawing = new gpBezier(x,y);
                         break;
 
                     default:
@@ -217,10 +251,12 @@ void GlutPaintPassiveMotionFunc(int x, int y){
     if( io.WantCaptureMouse )
         return;
 
-    if(  vertex_dragging != -1 && vertice_mode){
-        if( current_shape == DrawTriangle && current_drawing != nullptr && vertex_dragging < 3 ){
+    if(  vertex_dragging != -1 && vertice_mode && current_drawing != nullptr){
+        if( current_shape == DrawTriangle && vertex_dragging < 3 ){
             for(int i = vertex_dragging; i<3; i++)
                 current_drawing->setVertex(i, x, y);
+        }else if( current_shape == DrawBezier && vertex_dragging < 20 ){
+            current_drawing->setVertex(vertex_dragging, x, y);
         }
 
     }
