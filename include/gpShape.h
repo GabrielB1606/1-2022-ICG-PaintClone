@@ -6,12 +6,12 @@
 #include "GL/freeglut.h"
 #include "imgui.h"
 
-#define ROUNDNUM(x) ((int)( x >= .5f ? (x+1.0f) : x )) 
-#define MIN(x, y) ( x >= y ? y : x ) 
-#define MAX(x, y) ( x >= y ? x : y ) 
-#define ABS(x) ( x < 0 ? -x : x )
-#define MOD_INC(x, y) ( x+1 == y ? 0 : x+1 )
-#define MOD_DEC(x, y) ( x-1 < 0 ? y-1 : x-1 )
+#define ROUNDNUM(x) ((int)( (x) >= .5f ? ((x)+1.0f) : (x) )) 
+#define MIN(x, y) ( (x) >= (y) ? (y) : (x) ) 
+#define MAX(x, y) ( (x) >= (y) ? (x) : (y) ) 
+#define ABS(x) ( (x) < 0 ? -1*(x) : (x) )
+#define MOD_INC(x, y) ( (x)+1 == (y) ? 0 : (x)+1 )
+#define MOD_DEC(x, y) ( (x)-1 < 0 ? (y)-1 : (x)-1 )
 
 using namespace std;
 
@@ -19,7 +19,7 @@ static short vertex_dragging = -1;
 static bool center_mode = false;
 static bool vertice_mode = false;
 static int mouse_pos[2] = {0, 0};
-static float t_val = 0.05;
+static int n_segments = 100;
 
 class gpShape
 {
@@ -31,6 +31,7 @@ class gpShape
 		bool selected = false;
 
 	public:
+
 
 		gpShape(int x0, int y0){
 			vertex[2][0] = vertex[1][0] = vertex[0][0] = x0;
@@ -49,9 +50,7 @@ class gpShape
 			this->border_color = border_color;
 		}
 
-		~gpShape(){
-			// cout << "Se destruyo un shape" << endl;
-		}
+		~gpShape(){}
 
 		int* getCenter(){
 			return vertex[2];
@@ -61,16 +60,15 @@ class gpShape
 			return vertex[2][i];
 		}
 
+		bool isSelected(){ return selected; }
+
 		static void putPixel(int x, int y){
 			
 			ImGuiIO& io = ImGui::GetIO();
 
-			// y = 30;
-
 			glPointSize(1.5f);
 			glBegin(GL_POINTS);
 			glVertex2i(x,  (int)io.DisplaySize.y - y);
-			// glVertex2i(x, y);
 			glEnd();
 		}
 
@@ -87,25 +85,39 @@ class gpShape
 		
 		// recibe el click del mouse y retorna true si efectivamente
 		// el objetos fue seleccionado
-		virtual bool onClick(int x, int y) = 0;
+		virtual bool onClick(int x, int y){
+
+			return x >= bounding_box[0][0] && x <= bounding_box[1][0] && y >= bounding_box[0][1] && y <= bounding_box[1][1];
+
+		}
 		
 		void select(bool s){
+			selected = s;
+		}
+
+		virtual void updateBoundingBox(){
 			bounding_box[0][0] = MIN(vertex[0][0], vertex[1][0]);
 			bounding_box[0][1] = MIN(vertex[0][1], vertex[1][1]);
 			bounding_box[1][0] = MAX(vertex[0][0], vertex[1][0]);
 			bounding_box[1][1] = MAX(vertex[0][1], vertex[1][1]);
-			
-			selected = s;
+		}
+
+		static void draw7x7(int h, int k){
+			for(int x = -3; x<=3; x++){
+				glColor3f(70, 70, 70);
+				for(int y = -3; y<=3; y++)
+					putPixel( h+x, k+y );
+				glColor3f(0, 0, 0);
+				putPixel( h+x, k+x );
+				putPixel( h+x, k-x );
+			}
 		}
 
 		virtual void renderBoundingBox(){
 
 			glColor3f(70, 70, 70);
-			for(int i = 0; i<2; i++)
-				for(int j = 0; j<2; j++)
-					for(int x = -3; x<=3; x++)
-						for(int y = -3; y<=3; y++)
-							putPixel( bounding_box[i][0]+x, bounding_box[j][1]+y );
+			draw7x7(bounding_box[0][0], bounding_box[0][1]);
+			draw7x7(bounding_box[1][0], bounding_box[1][1]);
 
 		}
 
@@ -147,6 +159,8 @@ class gpShape
 				vertex[m][0] = vertex[2][0] + (vertex[2][0] - vertex[n][0]);
 				vertex[m][1] = vertex[2][1] + (vertex[2][1] - vertex[n][1]);
 			}
+
+			updateBoundingBox();
 		}
 
 		void setCenter(int x, int y){

@@ -7,21 +7,13 @@ class gpTriangle : public gpShape{
 
 	private:
         int firstClick[2];
-		int main_axis[3] = {0, 0, 0};
-		float m[3];
-		float b2;
+		int main_axis[2] = {0, 0};
+		float m[2];
 
 	public:
-		gpTriangle(int x0, int y0) : gpShape(x0, y0){
-			
+		gpTriangle(int x0, int y0) : gpShape(x0, y0){}
 
-	
-		}
-
-		~gpTriangle()
-		{
-			// cout << "Se destruyo una linea" << endl;
-		}
+		~gpTriangle(){}
 
 		void updateSlope(int n){
 			
@@ -48,9 +40,6 @@ class gpTriangle : public gpShape{
 				else
 					m[n] = 1;
 			}			
-		
-			// if(n == 2)
-			// 	b2 = vertex[2][ main_axis[2] ]*m[2]-vertex[2][sec_axis];
 
 		}
 
@@ -67,17 +56,20 @@ class gpTriangle : public gpShape{
                     vertex[0][0] = firstClick[0];
                 }
 				vertex[0][1] = vertex[1][1];
-                // vertex[n][1] = MIN(vertex[0][1], vertex[1][1]);
                 vertex[2][0] = (vertex[0][0]+vertex[1][0]) >> 1;
 
 				updateSlope(0);
 				updateSlope(1);
-				updateSlope(2);
+				// updateSlope(2);
             }else{
-				updateSlope(n);
-				updateSlope( MOD_DEC(n, 3) );
+				if(n!=2)
+					updateSlope(n);
+				
+				if(n!=1)
+					updateSlope( MOD_DEC(n, 3) );
 			}
 
+			updateBoundingBox();
         }
 
 		void hardwareRenderFill()
@@ -107,64 +99,61 @@ class gpTriangle : public gpShape{
 
 		void renderBoundingBox(){
 
-			glColor3f(70, 70, 70);
 			for(int i = 0; i<3; i++)
-				for(int x = -3; x<=3; x++)
-					for(int y = -3; y<=3; y++)
-						putPixel( vertex[i][0]+x, vertex[i][1]+y );
+				gpShape::draw7x7( vertex[i][0], vertex[i][1]);
 
 		}
 
 		void softwareRender(){
 
-			float point[3][2] = {
+			float point[2][2] = {
 				{(float)vertex[1][0], (float)vertex[1][1]},
-				{(float)vertex[1][0], (float)vertex[1][1]},
-				{(float)vertex[2][0], (float)vertex[2][1]}
+				{(float)vertex[1][0], (float)vertex[1][1]}
 			};
 
-			float final[3] = {
+			float final[2] = {
 				(float)vertex[0][main_axis[0]],
-				(float)vertex[2][main_axis[1]],
-				(float)vertex[0][main_axis[2]]
+				(float)vertex[2][main_axis[1]]
 			};
 
-			int sec_axis[3] = {
+			int sec_axis[2] = {
 				(main_axis[0]+1)&1,
-				(main_axis[1]+1)&1,
-				(main_axis[2]+1)&1
+				(main_axis[1]+1)&1
 			};
 
-			int step[3] = {
+			int step[2] = {
 				vertex[0][main_axis[0]] > vertex[1][main_axis[0]]? 1:-1,
-				vertex[2][main_axis[1]] > vertex[1][main_axis[1]]? 1:-1,
-				vertex[0][main_axis[2]] > vertex[2][main_axis[2]]? 1:-1
+				vertex[2][main_axis[1]] > vertex[1][main_axis[1]]? 1:-1
 			};
 
-			glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
 			
-			while( (int)point[0][main_axis[0]] != (int)final[0] ){
-				putPixel( ROUNDNUM( point[0][0] ),  ROUNDNUM( point[0][1] ) );
-				point[0][sec_axis[0]] += step[0]*m[0];
-				point[0][main_axis[0]] += step[0];
-			}
+			int drawing = 0b11;
 
-			while( (int)point[1][main_axis[1]] != (int)final[1] ){
-				putPixel( ROUNDNUM( point[1][0] ),  ROUNDNUM( point[1][1] ) );
-				point[1][sec_axis[1]] += step[1]*m[1];
-				point[1][main_axis[1]] += step[1];
-			}
+			while( drawing ){
 
-			while( (int)point[2][main_axis[2]] != (int)final[2] ){
-				// gpLine::draw( (int)point[2][0], (int)point[2][1], (int)vertex[1][0], (int)vertex[1][1], fill_color );
-			
-				putPixel( ROUNDNUM( point[2][0] ),  ROUNDNUM( point[2][1] ) );
-			
-				point[2][sec_axis[2]] += step[2]*m[2];
-				point[2][main_axis[2]] += step[2];
-			}
+				gpLine::draw( (int)point[0][0], (int)point[0][1], (int)point[1][0], (int)point[1][1], fill_color );
 
+				glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
+				
+				if( (int)point[0][main_axis[0]] != (int)final[0] ){
+					putPixel( ROUNDNUM( point[0][0] ),  ROUNDNUM( point[0][1] ) );
+					point[0][sec_axis[0]] += step[0]*m[0];
+					point[0][main_axis[0]] += step[0];
+				}else{
+					drawing &= 0b01;
+				}
+
+				if( (int)point[1][main_axis[1]] != (int)final[1] ){
+					putPixel( ROUNDNUM( point[1][0] ),  ROUNDNUM( point[1][1] ) );
+					point[1][sec_axis[1]] += step[1]*m[1];
+					point[1][main_axis[1]] += step[1];
+				}else{
+					drawing &= 0b10;
+				}
+			}
 			
+			gpLine::draw( (int)vertex[2][0], (int)vertex[2][1], (int)vertex[0][0], (int)vertex[0][1], border_color );
+
 		}
 
 		int areaTimes2(int x1, int y1,int x2, int y2,int x3, int y3){
@@ -175,6 +164,9 @@ class gpTriangle : public gpShape{
 		bool onClick(int x, int y) 
 		{
 			
+			if( !gpShape::onClick(x, y) )
+				return false;
+
 			int area_ABC = areaTimes2( vertex[0][0], vertex[0][1], vertex[1][0], vertex[1][1], vertex[2][0], vertex[2][1] );
 			
 			int area_PBC = areaTimes2( x, y, vertex[1][0], vertex[1][1], vertex[2][0], vertex[2][1] );
@@ -183,21 +175,24 @@ class gpTriangle : public gpShape{
 			
 			int area_PAB = areaTimes2( vertex[0][0], vertex[0][1], vertex[1][0], vertex[1][1], x, y );
 
-			// printf("%f = %f + %f + %f\n",area_ABC, area_PBC, area_PAC, area_PAB);
-
 			area_ABC -= ( ABS(area_PBC) + ABS(area_PAC) + ABS(area_PAB) );
 			
-			// printf(" = %f \n",area_ABC);
-
 			return area_ABC == 0;
 		}
 
-		// void onMove(int x, int y){
-		// }
+		void updateBoundingBox(){
 
-		// void select(bool s){
+			bounding_box[1][0] = bounding_box[0][0] = vertex[0][0];
+			bounding_box[1][1] = bounding_box[0][1] = vertex[0][1];
 
-		// }
+			for(int i = 1; i<3; i++){
+				bounding_box[0][0] = MIN(bounding_box[0][0], vertex[i][0]);
+				bounding_box[0][1] = MIN(bounding_box[0][1], vertex[i][1]);
+				bounding_box[1][0] = MAX(bounding_box[1][0], vertex[i][0]);
+				bounding_box[1][1] = MAX(bounding_box[1][1], vertex[i][1]);
+			}
+
+		}
 
 };
 

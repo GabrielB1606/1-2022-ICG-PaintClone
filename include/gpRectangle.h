@@ -8,23 +8,9 @@ class gpRectangle : public gpShape{
 	private:
 
 	public:
-		gpRectangle(int x0, int y0) : gpShape(x0, y0){
-			
-	
-		}
+		gpRectangle(int x0, int y0) : gpShape(x0, y0){}
 
-		~gpRectangle()
-		{
-			cout << "Se destruyo una linea" << endl;
-		}
-
-		// void set(int x0, int y0, int x1, int y1)
-		// {
-		// 	this->vertex[0][0] = x0;
-		// 	this->y0 = y0;
-		// 	this->x1 = x1;
-		// 	this->y1 = y1;
-		// }
+		~gpRectangle(){}
 
 		static void draw(int x0, int y0, int x1, int y1, ImVec4 color){
 			glColor4f(color.x * color.w, color.y * color.w, color.z * color.w, color.w);
@@ -101,18 +87,6 @@ class gpRectangle : public gpShape{
                     putPixel(i,j);
 
 		}
-
-		bool onClick(int x, int y) {
-			return x >= MIN(vertex[0][0], vertex[1][0]) && x <= MAX(vertex[0][0], vertex[1][0]) &&y >= MIN(vertex[0][1], vertex[1][1]) && y <= MAX(vertex[0][1], vertex[1][1]);
-		}
-
-		void onMove(int x, int y)
-		{
-		}
-
-		// void select(bool s){
-
-		// }
 
 };
 

@@ -47,7 +47,7 @@ void ImGuiPaintDisplay(){
     ImGui_ImplGLUT_NewFrame();
 
     // Setup the actual GUI
-    ImGui::Begin("Hello World");
+    ImGui::Begin("Menu");
         ImVec2 size = ImGui::GetItemRectSize();
 
         ImGui::Text("Background Color");
@@ -60,7 +60,19 @@ void ImGuiPaintDisplay(){
         ImGui::Checkbox("Selection Mode", &selection_mode);
 
         if(ImGui::Button("Delete"))
-            deleteCurrent();
+            GlutPaintDeleteCurrent();
+
+        if(ImGui::Button("Move Up"))
+            GlutPaintMoveUp();
+        ImGui::SameLine();
+        if(ImGui::Button("Move Down"))
+            GlutPaintMoveDown();
+        
+        if(ImGui::Button("Move Front"))
+            GlutPaintMoveFront();
+        ImGui::SameLine();
+        if(ImGui::Button("Move Back"))
+            GlutPaintMoveBack();
 
         ImGui::Separator();
         // ImGui::Text("Draw");
@@ -76,7 +88,13 @@ void ImGuiPaintDisplay(){
             "Triangle",
             "Bezier Curve"
         };
-        ImGui::ListBox(" ", &current_shape, shapes, IM_ARRAYSIZE(shapes), 6);
+        if(ImGui::ListBox(" ", &current_shape, shapes, IM_ARRAYSIZE(shapes), 6)){
+            selection_mode = false;
+            if( current_drawing != nullptr ){
+                current_drawing->select(false);
+                current_drawing = nullptr;
+            }
+        }
 
         ImGui::Separator();
         ImGui::Text("Properties");
@@ -87,8 +105,8 @@ void ImGuiPaintDisplay(){
             ImGui::SameLine();
             HelpMarker("The first point given will be taken as the center.\n\n(Drag while pressing Alt)");
         }else{
-            if(ImGui::SliderFloat("t", &t_val, 0.001f, 0.5f) && current_drawing!= nullptr)            // Edit 1 float using a slider from 0.0f to 1.0f
-                ((gpBezier*)current_drawing)->setT(t_val);
+            if(ImGui::SliderInt("t", &n_segments, 1, 150) && current_drawing!= nullptr)            // Edit 1 float using a slider from 0.0f to 1.0f
+                ((gpBezier*)current_drawing)->setT(n_segments);
             ImGui::SameLine();
             HelpMarker("Value of variable t. A smaller t implies a smoother curve with a penalty in performance.");
         }

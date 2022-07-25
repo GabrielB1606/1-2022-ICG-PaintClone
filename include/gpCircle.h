@@ -130,8 +130,11 @@ class gpCircle : public gpShape{
 
 		}
 
-		bool onClick(int x, int y) 
-		{
+		bool onClick(int x, int y){
+
+			if( !gpShape::onClick(x, y) )
+				return false;
+
 			int dx = getCenter(0) - x;
 			int dy = getCenter(1) - y;
 

@@ -144,6 +144,9 @@ class gpEllipse : public gpShape{
 		}
 
 		bool onClick(int x, int y){
+
+			if( !gpShape::onClick(x, y) )
+				return false;
 			
 			int x_h = x-getCenter()[0];
 			int y_k = y-getCenter()[1];

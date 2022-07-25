@@ -28,6 +28,7 @@ static ImVec4 border_color = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
 static int current_shape = 0;
 deque<gpShape*> shapes;
 gpShape* current_drawing = nullptr;
+int current_drawing_idx = -1;
 // static short vertex_dragging = -1;
 
 // drawing modes
@@ -40,6 +41,10 @@ void GlutPaintMouseFunc(int, int, int, int);
 void GlutPaintMotionFunc(int, int);
 void GlutPaintInstallFuncs();
 void GlutPaintCleanup();
+void GlutPaintMoveUp();
+void GlutPaintMoveDown();
+void GlutPaintMoveFront();
+void GlutPaintMoveBack();
 
 
 void GlutPaintInit(){
@@ -66,45 +71,6 @@ void GlutPaintDisplay(){
 
     // glClearColor(1, 1, 1, 1);
     glClear(GL_COLOR_BUFFER_BIT);
-
-    // gpTriangle tr(300, 300);
-    // tr.setVertex(1, 700, 300);
-    // tr.setVertex(2, 500, 500);
-    // tr.setBorderColor( border_color );
-    // tr.setFillColor( ImVec4(255, 255, 255, 1) );
-    // tr.softwareRender();
-
-    // glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
-    //     glBegin( GL_LINE_STRIP );
-    //     glVertex2i(  300, 300 );
-    //     glVertex2i(  500, 500 );
-    //     glVertex2i(  700, 300 );
-    //     glEnd();
-
-    // gpBezier test(300, 300);
-    // test.setVertex(1, 500, 500);
-    // test.setVertex(2, 700, 300);
-    // test.setVertex(3, 800, 700);
-    // test.setVertex(4, 900, 715);
-    // test.setVertex(5, 1000, 650);
-    // test.setVertex(6, 800, 675);
-    // test.setVertex(7, 700, 700);
-    // test.setVertex(8, 600, 600);
-    // test.setVertex(9, 500, 500);
-    // test.setBorderColor( border_color );
-    // test.setFillColor( fill_color );
-    // test.softwareRender();
-
-    // glBegin(GL_TRIANGLES);
-    //     glColor3f(2,0,0);
-    //     glVertex3f(300, 300, 0);
-        
-    //     glColor3f(0,1,0);
-    //     glVertex3f( 700, 300, 0);
-        
-    //     glColor3f(0,0,1);
-    //     glVertex3f( 500,  500, 0);
-    // glEnd();
     glFlush();
 
     if( current_drawing != nullptr ){
@@ -115,7 +81,7 @@ void GlutPaintDisplay(){
     for( gpShape* shape : shapes )
         shape->render(hardware_mode);
     
-    if( current_drawing != nullptr )
+    if( current_drawing != nullptr && !current_drawing->isSelected() )
         current_drawing->render(hardware_mode);
 }
 
@@ -145,9 +111,9 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
                     
                     current_drawing = shapes[i];
                     current_drawing->select(true);
-                    shapes.erase( shapes.begin() + i );
-                    shapes.emplace_back(current_drawing);
-                    std::cout << "yo\n";
+                    current_drawing_idx = i;
+                    // shapes.erase( shapes.begin() + i );
+                    // shapes.emplace_back(current_drawing);
                     return;
                 }
             if(current_drawing != nullptr){
@@ -166,6 +132,7 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
             if( DrawBezier == current_shape ){
 
                 if(vertex_dragging == -1){
+                    vertice_mode = false;
                     current_drawing = new gpBezier(x, y);
                     vertex_dragging = 1;
                 }else if( vertex_dragging < 20 ){
@@ -173,6 +140,7 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
                     vertex_dragging++;
                     if( vertex_dragging >= 20 ){
                         shapes.emplace_back(current_drawing);
+                        current_drawing_idx = shapes.size()-1;
                         vertex_dragging = -1;
                     }
                 }
@@ -190,6 +158,7 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
                         vertex_dragging++;
                         if( vertex_dragging >= 3 ){
                             shapes.emplace_back(current_drawing);
+                            current_drawing_idx = shapes.size()-1;
                             vertex_dragging = -1;
                         }
                     }
@@ -230,6 +199,7 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
         }else if( glut_button == GLUT_RIGHT_BUTTON && DrawBezier == current_shape ){
             vertex_dragging = -1;
             shapes.emplace_back(current_drawing);
+            current_drawing_idx = shapes.size()-1;
         }
 
     }else if( state == GLUT_UP ){
@@ -237,6 +207,7 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
         if( !vertice_mode && current_shape != DrawBezier ){
             vertex_dragging = -1;
             shapes.emplace_back(current_drawing);
+            current_drawing_idx = shapes.size()-1;
         }
     }
     
@@ -278,7 +249,6 @@ void GlutPaintPassiveMotionFunc(int x, int y){
 
         }else if( current_shape == DrawBezier && vertex_dragging < 20 ){
             current_drawing->setVertex(vertex_dragging, x, y);
-            // printf("hey");
         }
 
 }
@@ -296,7 +266,7 @@ void GlutPaintCleanup(){
 
 }
 
-void deleteCurrent(){
+void GlutPaintDeleteCurrent(){
 
     if( shapes.size() ){
         current_drawing = shapes.back();
@@ -304,6 +274,46 @@ void deleteCurrent(){
         delete current_drawing;
         current_drawing = nullptr;
     }
+
+}
+
+void GlutPaintMoveUp(){
+    
+    if( current_drawing == nullptr || current_drawing_idx == shapes.size()-1 )
+        return;
+    
+    swap( shapes[ current_drawing_idx ], shapes[ current_drawing_idx+1 ]  );
+    current_drawing_idx++;
+
+}
+
+void GlutPaintMoveDown(){
+    if( current_drawing == nullptr || current_drawing_idx == 0 )
+        return;
+    
+    swap( shapes[ current_drawing_idx ], shapes[ current_drawing_idx-1 ]  );
+    current_drawing_idx--;
+}
+
+void GlutPaintMoveFront(){
+
+    if( current_drawing == nullptr || current_drawing_idx == shapes.size()-1 )
+        return;
+    
+    shapes.erase( shapes.begin()+current_drawing_idx );
+    shapes.push_back( current_drawing );
+    current_drawing_idx = shapes.size()-1;
+
+}
+
+void GlutPaintMoveBack(){
+
+    if( current_drawing == nullptr || current_drawing_idx == 0 )
+        return;
+    
+    shapes.erase( shapes.begin()+current_drawing_idx );
+    shapes.push_front( current_drawing );
+    current_drawing_idx = 0;
 
 }
 
