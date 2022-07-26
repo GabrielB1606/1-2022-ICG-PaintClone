@@ -100,6 +100,17 @@ class gpShape
 			bounding_box[0][1] = MIN(vertex[0][1], vertex[1][1]);
 			bounding_box[1][0] = MAX(vertex[0][0], vertex[1][0]);
 			bounding_box[1][1] = MAX(vertex[0][1], vertex[1][1]);
+
+			vertex[0][0] = bounding_box[0][0];
+			vertex[0][1] = bounding_box[0][1];
+			vertex[1][0] = bounding_box[1][0];
+			vertex[1][1] = bounding_box[1][1];
+
+			// bounding_box[0][0] -= 3;
+			// bounding_box[0][1] -= 3;
+			// bounding_box[1][0] += 3;
+			// bounding_box[1][1] += 3;
+
 		}
 
 		static void draw7x7(int h, int k){
@@ -115,9 +126,10 @@ class gpShape
 
 		virtual void renderBoundingBox(){
 
-			glColor3f(70, 70, 70);
-			draw7x7(bounding_box[0][0], bounding_box[0][1]);
-			draw7x7(bounding_box[1][0], bounding_box[1][1]);
+			draw7x7(vertex[0][0], vertex[0][1]);
+			draw7x7(vertex[1][0], vertex[1][1]);
+			draw7x7(vertex[0][0], vertex[1][1]);
+			draw7x7(vertex[1][0], vertex[0][1]);
 
 		}
 
@@ -150,7 +162,6 @@ class gpShape
 			vertex[n][0] = x;
 			vertex[n][1] = y;
 			
-
 			if( !center_mode ){
 				vertex[2][0] = (vertex[0][0]+vertex[1][0]) >> 1;
 				vertex[2][1] = (vertex[0][1]+vertex[1][1]) >> 1;
@@ -160,7 +171,7 @@ class gpShape
 				vertex[m][1] = vertex[2][1] + (vertex[2][1] - vertex[n][1]);
 			}
 
-			updateBoundingBox();
+			// updateBoundingBox();
 		}
 
 		void setCenter(int x, int y){
@@ -168,8 +179,53 @@ class gpShape
 			vertex[2][1] = y;
 		}
 		
-		void onMove(int x, int y){
+		virtual bool onVertex(int x, int y){
+			int dx, dy;
+			// int diff[2] = {x - mouse_pos[0], y - mouse_pos[1]};
+
+			dx = vertex[0][0] - x;
+			if( (ABS(dx)) <= 8 ){
+				dy = vertex[0][1] - y;
+				if( (ABS(dy)) <= 8){
+					vertex[0][0] = x;
+					vertex[0][1] = y;
+					return true;
+				}
+				dy = vertex[1][1] - y;
+				if( (ABS(dy)) <= 8){
+					vertex[0][0] = x;
+					vertex[1][1] = y;
+					return true;
+				}
+			}
+
+			dx = vertex[1][0] - x;
+			if( (ABS(dx)) <= 8 ){
+				dy = vertex[0][1] - y;
+				if( (ABS(dy)) <= 8){
+					vertex[1][0] = x;
+					vertex[0][1] = y;
+					return true;
+				}
+				dy = vertex[1][1] - y;
+				if( (ABS(dy)) <= 8){
+					vertex[1][0] = x;
+					vertex[1][1] = y;
+					return true;
+				}
+			}
+
+			return false;
 			
+		}
+
+		virtual void onMove(int x, int y){
+			
+			if(onVertex(x, y)){
+				// updateBoundingBox();
+				return;
+			}
+
 			if( onClick(x, y) && selected ){
 				
 				int diff[2] = {x - mouse_pos[0], y - mouse_pos[1]};

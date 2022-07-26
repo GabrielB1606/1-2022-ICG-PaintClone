@@ -103,6 +103,12 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
     if( selection_mode ){
 
         if( state == GLUT_DOWN && glut_button == GLUT_LEFT_BUTTON ){
+
+            if( current_drawing != nullptr && current_drawing->onVertex(x, y) ){
+                current_drawing->updateBoundingBox();
+                return;
+            }
+
             for(int i = shapes.size()-1; i>=0; i--)
                 if( shapes[i]->onClick(x, y) ){
                     
@@ -120,6 +126,9 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
                 current_drawing->select(false);
                 current_drawing = nullptr;
             }
+        }else if( state == GLUT_UP ){
+            if(current_drawing != nullptr)
+                current_drawing->updateBoundingBox();
         }
 
         return;
@@ -140,6 +149,7 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
                     vertex_dragging++;
                     if( vertex_dragging >= 20 ){
                         shapes.emplace_back(current_drawing);
+                        ((gpBezier*)current_drawing)->setT(n_segments);
                         current_drawing_idx = shapes.size()-1;
                         vertex_dragging = -1;
                     }
@@ -199,16 +209,23 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
         }else if( glut_button == GLUT_RIGHT_BUTTON && DrawBezier == current_shape ){
             vertex_dragging = -1;
             shapes.emplace_back(current_drawing);
+            ((gpBezier*)current_drawing)->setT(n_segments);
             current_drawing_idx = shapes.size()-1;
         }
 
     }else if( state == GLUT_UP ){
         // current_drawing->setVertex(vertex_dragging,x,y);
-        if( !vertice_mode && current_shape != DrawBezier ){
-            vertex_dragging = -1;
-            shapes.emplace_back(current_drawing);
-            current_drawing_idx = shapes.size()-1;
+        if( current_drawing != nullptr ){
+            if( !vertice_mode && current_shape != DrawBezier ){
+                vertex_dragging = -1;
+                shapes.emplace_back(current_drawing);
+                current_drawing_idx = shapes.size()-1;
+            }
+            
+            current_drawing->updateBoundingBox();
+            
         }
+        
     }
     
 }
@@ -224,6 +241,10 @@ void GlutPaintMotionFunc(int x, int y){
         return;
 
     if( selection_mode ){
+        if( current_drawing != nullptr && current_drawing->isSelected() && current_drawing->onVertex(x, y) ){
+            // current_drawing->updateBoundingBox();
+            return;
+        }
         current_drawing->onMove(x, y);
     }
 

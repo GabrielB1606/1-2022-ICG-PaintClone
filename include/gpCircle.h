@@ -17,7 +17,19 @@ class gpCircle : public gpShape{
 
 		~gpCircle()
 		{
-			cout << "Se destruyo una linea" << endl;
+			// cout << "Se destruyo una linea" << endl;
+		}
+
+		void updateBoundingBox(){
+			vertex[0][0] = bounding_box[0][0] = getCenter()[0]-r;
+			vertex[0][1] = bounding_box[0][1] = getCenter()[1]-r;
+			vertex[1][0] = bounding_box[1][0] = getCenter()[0]+r;
+			vertex[1][1] = bounding_box[1][1] = getCenter()[1]+r;
+
+			bounding_box[0][0] -= 3;
+			bounding_box[0][1] -= 3;
+			bounding_box[1][0] += 3;
+			bounding_box[1][1] += 3;
 		}
 
 		void setVertex(int n, int x, int y){
@@ -28,6 +40,13 @@ class gpCircle : public gpShape{
 			int radius_y = abs(getCenter()[1] - vertex[0][1]);
 
 			r = radius_x < radius_y? radius_x:radius_y;
+
+			// bounding_box[0][0] = getCenter()[0]-r;
+			// bounding_box[0][1] = getCenter()[1]-r;
+			// bounding_box[1][0] = getCenter()[0]+r;
+			// bounding_box[1][1] = getCenter()[1]+r;
+
+			// updateBoundingBox();
 
 		}
 
@@ -98,10 +117,6 @@ class gpCircle : public gpShape{
 				}
 		}
 
-		// void select(bool s){
-
-		// }
-
 		void softwareRender(){
 
 			int point[2] = {0, r};
@@ -139,10 +154,6 @@ class gpCircle : public gpShape{
 			int dy = getCenter(1) - y;
 
 			return (dx*dx + dy*dy) <= (r*r);
-		}
-
-		void onMove(int x, int y)
-		{
 		}
 
 };

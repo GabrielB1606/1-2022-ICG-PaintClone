@@ -105,10 +105,10 @@ void ImGuiPaintDisplay(){
             ImGui::SameLine();
             HelpMarker("The first point given will be taken as the center.\n\n(Drag while pressing Alt)");
         }else{
-            if(ImGui::SliderInt("t", &n_segments, 1, 150) && current_drawing!= nullptr)            // Edit 1 float using a slider from 0.0f to 1.0f
+            if(ImGui::SliderInt("Number of\nSegments", &n_segments, 1, 150) && current_drawing!= nullptr)            // Edit 1 float using a slider from 0.0f to 1.0f
                 ((gpBezier*)current_drawing)->setT(n_segments);
             ImGui::SameLine();
-            HelpMarker("Value of variable t. A smaller t implies a smoother curve with a penalty in performance.");
+            HelpMarker("Number of divisions in the curve. A bigger quantity implies a smoother curve with a penalty in performance.");
         }
 
         if( current_shape == DrawTriangle ){

@@ -12,11 +12,11 @@ class gpBezier : public gpShape{
     private:
         std::vector<int *> vertex;
         std::deque<int *> segments; 
-        float t;
+        float t = 0.1f;
 
     public:
         gpBezier(int x0, int y0) : gpShape(x0, y0){
-            t = 1.0f/(float)n_segments;
+            // t = 1.0f/(float)n_segments;
             vertex.reserve(21);
             vertex.push_back( new int[2]{x0, y0} );
         }
@@ -33,8 +33,8 @@ class gpBezier : public gpShape{
         void hardwareRender(){
             glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
             glBegin( GL_LINE_STRIP );
-            for(size_t i = 0; i<vertex.size(); i++)
-                glVertex2i( vertex[i][0], 720-vertex[i][1] );
+            for(size_t i = 0; i<segments.size(); i++)
+                glVertex2i( segments[i][0], 720-segments[i][1] );
             glEnd();
             glFlush();
         }
@@ -72,6 +72,7 @@ class gpBezier : public gpShape{
 
             }
 
+            // updateBoundingBox();
         }
 
         void softwareRender(){
@@ -90,7 +91,7 @@ class gpBezier : public gpShape{
         }
 
         void setVertex(int n, int x, int y){
-            // printf("vertex dragging: %d\n", n);
+
             if(n >= 20)
                 return;
 
@@ -110,7 +111,18 @@ class gpBezier : public gpShape{
             if( !gpShape::onClick(x, y) )
                 return false;
 
-        return false; 
+            // printf("in bounding\n");
+
+            int dx, dy;
+
+            for(size_t i = 0; i<segments.size(); i++){
+                dx = segments[i][0] - x;
+                dy = segments[i][1] - y;
+                if( (dx*dx + dy*dy) <= (25) )
+                    return true;
+            }
+
+            return false; 
         }
 
         int lerp(int p0, int p1, float t){
@@ -139,12 +151,50 @@ class gpBezier : public gpShape{
             bounding_box[1][0] = bounding_box[0][0] = vertex[0][0];
             bounding_box[1][1] = bounding_box[0][1] = vertex[0][1];
 
-            for(size_t i = 1; i<segments.size(); i++){
+            for(size_t i = 1; i<segments.size(); i+=2){
                 bounding_box[0][0] = MIN(bounding_box[0][0], segments[i][0]);
                 bounding_box[0][1] = MIN(bounding_box[0][1], segments[i][1]);
                 bounding_box[1][0] = MAX(bounding_box[1][0], segments[i][0]);
                 bounding_box[1][1] = MAX(bounding_box[1][1], segments[i][1]);
             }
+
+        }
+
+        void onMove(int x, int y){
+            if( gpShape::onClick(x, y) && selected ){
+				
+				int diff[2] = {x - mouse_pos[0], y - mouse_pos[1]};
+
+				for(size_t i =0; i<vertex.size(); i++){
+					vertex[i][0] += diff[0];
+					vertex[i][1] += diff[1];
+				}
+
+                for(size_t i =0; i<segments.size(); i++){
+					segments[i][0] += diff[0];
+					segments[i][1] += diff[1];
+				}
+
+				for(int i = 0; i< 2; i++){
+					bounding_box[i][0] += diff[0];
+					bounding_box[i][1] += diff[1];
+				}
+			}
+        }
+
+        void renderBoundingBox(){
+            
+            glColor3f(70, 70, 70);
+            glLineStipple(1, 0xAAAA);  
+            glEnable(GL_LINE_STIPPLE);
+            glBegin(GL_LINE_STRIP);
+                for(size_t i = 0; i<vertex.size(); i++)
+                    glVertex2i(vertex[i][0], 720 - vertex[i][1]);    
+            glEnd();
+            glDisable(GL_LINE_STIPPLE);
+
+            for(size_t i = 0; i<vertex.size(); i++)
+                gpShape::draw7x7( vertex[i][0], vertex[i][1] );
 
         }
 
