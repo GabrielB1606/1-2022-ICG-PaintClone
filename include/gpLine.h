@@ -11,7 +11,23 @@ class gpLine : public gpShape{
 		int main_axis = 0;
 
 	public:
+
+		std::string toString(){
+			std::stringstream sstr;
+			
+			sstr<<"LINE ";
+
+			for(int i = 0; i<4; i++)
+				sstr << vertex[0][i] << " ";
+
+			sstr << border_color.x << " " << border_color.y << " " << border_color.z;
+
+			return sstr.str();
+
+		}	
+
 		gpLine(int x0, int y0) : gpShape(x0, y0){
+			shape = DrawLine;
 		}
 
 		gpLine(int x0, int y0, int x1, int y1, ImVec4 color) : gpShape(x0, y0, x1, y1, color){

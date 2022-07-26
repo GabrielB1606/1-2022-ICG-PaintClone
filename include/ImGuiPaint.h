@@ -3,6 +3,8 @@
 
 #include "GlutPaint.h"
 #include "tinyfiledialogs.h"
+#include <fstream>
+
 
 void ImGuiPaintInit(){
     // Setup Dear ImGui context
@@ -66,6 +68,28 @@ void TinyFDSaveFile(){
 
     if( !filename )
         return;
+    
+    std::stringstream txt;
+
+    txt << "BACKGROUND "<<background_color.x << " " << background_color.y << " " << background_color.z << "\n";
+
+    for( size_t i = 0; i < shapes.size(); i++ )
+        txt << shapes[i]->toString() << "\n";
+    
+    ofstream f( filename );
+
+    if(f.fail() ){
+        tinyfd_messageBox(
+			"Error",
+			"Couln't open file",
+			"ok",
+			"error",
+			1);
+        return;
+    }
+
+    f << txt.str();
+    f.close();
 
 }
 

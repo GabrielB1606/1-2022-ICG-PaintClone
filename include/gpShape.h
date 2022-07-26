@@ -2,6 +2,7 @@
 #define GP_SHAPE_H
 
 #include <iostream>
+#include <sstream>
 
 #include "GL/freeglut.h"
 #include "imgui.h"
@@ -32,8 +33,15 @@ class gpShape
 		int bounding_box[2][2];
 		bool selected = false;
 		bool filled;
+		EnumDrawShape shape;
 
 	public:
+
+		EnumDrawShape getShape(){
+			return shape;
+		}
+
+		virtual std::string toString() = 0;
 
 		gpShape(int x0, int y0){
 			vertex[2][0] = vertex[1][0] = vertex[0][0] = x0;

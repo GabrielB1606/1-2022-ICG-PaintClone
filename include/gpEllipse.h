@@ -10,8 +10,28 @@ class gpEllipse : public gpShape{
 		int rx, ry, rxrx, ryry;
 
 	public:
-		gpEllipse(int x0, int y0) : gpShape(x0, y0){
+
+		std::string toString(){
+			std::stringstream sstr;
+
+			if(filled)
+				sstr << "FILLED_";
 			
+			sstr<<"ELLIPSE ";
+
+			for(int i = 0; i<4; i++)
+				sstr << vertex[0][i] << " ";
+
+			sstr << border_color.x << " " << border_color.y << " " << border_color.z;
+			
+			if(filled)		
+				sstr << " " << fill_color.x << " " << fill_color.y << " " << fill_color.z;	
+
+			return sstr.str();
+		}	
+
+		gpEllipse(int x0, int y0) : gpShape(x0, y0){
+			shape = DrawEllipse;
 	
 		}
 

@@ -15,7 +15,23 @@ class gpBezier : public gpShape{
         float t = 0.1f;
 
     public:
+
+        std::string toString(){
+			std::stringstream sstr;
+			
+			sstr<<"BEZIER" << vertex.size() << " ";
+
+			for(size_t i = 0; i<vertex.size(); i++)
+				sstr << vertex[i][0] << " " << vertex[i][1] << " ";
+
+			sstr << border_color.x << " " << border_color.y << " " << border_color.z;
+
+			return sstr.str();
+
+		}	
+
         gpBezier(int x0, int y0) : gpShape(x0, y0){
+            shape = DrawBezier;
             // t = 1.0f/(float)n_segments;
             vertex.reserve(21);
             vertex.push_back( new int[2]{x0, y0} );
