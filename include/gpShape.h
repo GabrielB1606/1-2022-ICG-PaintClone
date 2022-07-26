@@ -18,6 +18,7 @@ using namespace std;
 static short vertex_dragging = -1;
 static bool center_mode = false;
 static bool vertice_mode = false;
+static bool selection_mode = false;
 static int mouse_pos[2] = {0, 0};
 static int n_segments = 100;
 

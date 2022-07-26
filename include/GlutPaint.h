@@ -33,7 +33,6 @@ int current_drawing_idx = -1;
 
 // drawing modes
 static bool hardware_mode = true;
-static bool selection_mode = false;
 
 void GlutPaintInit();
 void GlutPaintDisplay();

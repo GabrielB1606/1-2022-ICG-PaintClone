@@ -15,6 +15,40 @@ class gpTriangle : public gpShape{
 
 		~gpTriangle(){}
 
+		bool onVertex(int x, int y){
+			int dx, dy;
+			// int diff[2] = {x - mouse_pos[0], y - mouse_pos[1]};
+
+			dx = vertex[0][0] - x;
+			if( (ABS(dx)) <= 8 ){
+				dy = vertex[0][1] - y;
+				if( (ABS(dy)) <= 8){
+					setVertex(0, x, y);
+					return true;
+				}
+			}
+
+			dx = vertex[1][0] - x;
+			if( (ABS(dx)) <= 8 ){
+				dy = vertex[1][1] - y;
+				if( (ABS(dy)) <= 8){
+					setVertex(1, x, y);
+					return true;
+				}
+			}
+
+			dx = vertex[2][0] - x;
+			if( (ABS(dx)) <= 8 ){
+				dy = vertex[2][1] - y;
+				if( (ABS(dy)) <= 8){
+					setVertex(2, x, y);
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		void updateSlope(int n){
 			
 			int dest = MOD_INC(n, 3);
@@ -47,7 +81,7 @@ class gpTriangle : public gpShape{
             vertex[n][0] = x;
             vertex[n][1] = y;
 
-            if( !vertice_mode ){
+            if( !vertice_mode && !selection_mode ){
                 if(n == 0){
                     firstClick[0] = x;
                     firstClick[1] = y ;
@@ -65,7 +99,7 @@ class gpTriangle : public gpShape{
 				if(n!=2)
 					updateSlope(n);
 				
-				if(n!=1)
+				if(n!=0)
 					updateSlope( MOD_DEC(n, 3) );
 			}
 
