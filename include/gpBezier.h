@@ -34,7 +34,7 @@ class gpBezier : public gpShape{
             glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
             glBegin( GL_LINE_STRIP );
             for(size_t i = 0; i<segments.size(); i++)
-                glVertex2i( segments[i][0], 720-segments[i][1] );
+                glVertex2i( segments[i][0], segments[i][1] );
             glEnd();
             glFlush();
         }

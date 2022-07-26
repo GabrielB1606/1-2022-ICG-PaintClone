@@ -108,17 +108,17 @@ class gpTriangle : public gpShape{
 
 		void hardwareRenderFill(){
 			glBegin( GL_TRIANGLES );
-				glVertex2i(vertex[0][0], window_height - vertex[0][1]);
-				glVertex2i(vertex[1][0], window_height - vertex[1][1]);
-				glVertex2i(vertex[2][0], window_height - vertex[2][1]);
+				glVertex2i(vertex[0][0],  vertex[0][1]);
+				glVertex2i(vertex[1][0],  vertex[1][1]);
+				glVertex2i(vertex[2][0],  vertex[2][1]);
 			glEnd();
 		}
 
 		void hardwareRenderBorder(){
 			glBegin( GL_LINE_LOOP );
-				glVertex2i(vertex[0][0], window_height - vertex[0][1]);
-				glVertex2i(vertex[1][0], window_height - vertex[1][1]);
-				glVertex2i(vertex[2][0], window_height - vertex[2][1]);
+				glVertex2i(vertex[0][0],  vertex[0][1]);
+				glVertex2i(vertex[1][0],  vertex[1][1]);
+				glVertex2i(vertex[2][0],  vertex[2][1]);
 			glEnd();
 		}
 

@@ -84,11 +84,11 @@ class gpCircle : public gpShape{
 
 			glBegin(GL_TRIANGLE_FAN);
 
-				glVertex2f(x, window_height - y); // center of circle
+				glVertex2f(x, y); // center of circle
 				for(int i = 0; i <= triangleAmount;i++) {
 					glVertex2f(
 						x + (r * cos(sum_theta) ),
-						window_height - (y + (r * sin(sum_theta) ))
+						(y + (r * sin(sum_theta) ))
 					);
 					sum_theta += theta;
 				}
@@ -113,7 +113,7 @@ class gpCircle : public gpShape{
 				for(int i = 0; i <= triangleAmount;i++) {
 					glVertex2f(
 						x + (r * cos(sum_theta) ),
-						window_height - (y + (r * sin(sum_theta) ))
+						(y + (r * sin(sum_theta) ))
 					);
 					sum_theta += theta;
 				}

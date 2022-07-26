@@ -118,8 +118,8 @@ class gpLine : public gpShape{
 			glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
 
 			glBegin(GL_LINES);
-				glVertex2i(vertex[0][0], window_height - vertex[0][1]);
-				glVertex2i(vertex[1][0], window_height - vertex[1][1]);
+				glVertex2i(vertex[0][0], vertex[0][1]);
+				glVertex2i(vertex[1][0], vertex[1][1]);
 			glEnd();
 		}
 
@@ -153,8 +153,8 @@ class gpLine : public gpShape{
 
 			int sec_axis = (main_axis+1)&1;
 
-			int b = vertex[1][sec_axis] - m*vertex[1][main_axis];
-			int should_be = m*point[main_axis] + b;
+			int b = (int)(vertex[1][sec_axis] - m*vertex[1][main_axis]);
+			int should_be = (int)(m*point[main_axis] + b);
 
 			int d = should_be - point[sec_axis];
 			

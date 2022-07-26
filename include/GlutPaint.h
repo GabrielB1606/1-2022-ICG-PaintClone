@@ -44,6 +44,7 @@ void GlutPaintMoveUp();
 void GlutPaintMoveDown();
 void GlutPaintMoveFront();
 void GlutPaintMoveBack();
+void GlutPaintReshapeFunc(int w, int h);
 
 
 void GlutPaintInit(){
@@ -55,7 +56,7 @@ void GlutPaintInit(){
 	glViewport(0, 0, window_width, window_height);	
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, window_width, 0, window_height, -1, 1);
+	glOrtho(0, window_width, window_height, 0, -1, 1);
 
 }
 
@@ -273,10 +274,25 @@ void GlutPaintPassiveMotionFunc(int x, int y){
 
 }
 
+void GlutPaintReshapeFunc(int w, int h){
+    window_width = w;
+    window_height = h;
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize = ImVec2((float)w, (float)h);
+    glViewport(0, 0, window_width, window_height);	
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, window_width, h, 0, -1, 1);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    // GlutPaintDisplay();
+}
+
 void GlutPaintInstallFuncs(){
     glutMouseFunc(GlutPaintMouseFunc);
     glutMotionFunc(GlutPaintMotionFunc);
     glutPassiveMotionFunc( GlutPaintPassiveMotionFunc );
+    glutReshapeFunc(GlutPaintReshapeFunc);
 }
 
 void GlutPaintCleanup(){

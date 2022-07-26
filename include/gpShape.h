@@ -65,11 +65,11 @@ class gpShape
 
 		static void putPixel(int x, int y){
 			
-			ImGuiIO& io = ImGui::GetIO();
+			// ImGuiIO& io = ImGui::GetIO();
 
 			glPointSize(1.5f);
 			glBegin(GL_POINTS);
-			glVertex2i(x,  (int)io.DisplaySize.y - y);
+			glVertex2i(x,   y);
 			glEnd();
 		}
 

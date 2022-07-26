@@ -43,11 +43,11 @@ class gpEllipse : public gpShape{
 
 			glBegin(GL_TRIANGLE_FAN);
 
-				glVertex2i(x, window_height - y); // center of circle
+				glVertex2i(x, y); // center of circle
 				for(int i = 0; i <= triangleAmount;i++) {
 					glVertex2f(
 						x + (rx * cos(sum_theta) ),
-						window_height - (y + (ry * sin(sum_theta) ))
+						(y + (ry * sin(sum_theta) ))
 					);
 					sum_theta += theta;
 				}
@@ -71,7 +71,7 @@ class gpEllipse : public gpShape{
 				for(int i = 0; i <= triangleAmount;i++) {
 					glVertex2f(
 						x + (rx * cos(sum_theta) ),
-						window_height - (y + (ry * sin(sum_theta) ))
+						(y + (ry * sin(sum_theta) ))
 					);
 					sum_theta += theta;
 				}
