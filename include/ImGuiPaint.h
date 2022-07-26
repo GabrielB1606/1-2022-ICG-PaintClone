@@ -2,6 +2,7 @@
 #define IMGUI_PAINT_H
 
 #include "GlutPaint.h"
+#include "tinyfiledialogs.h"
 
 void ImGuiPaintInit(){
     // Setup Dear ImGui context
@@ -40,6 +41,34 @@ static void HelpMarker(const char* desc)
     }
 }
 
+char const * lFilterPatterns[1] = { "*.txt"};
+
+void TinyFDLoadFile(){
+    char* filename = tinyfd_openFileDialog(
+		"Load File",
+		"",
+		1,
+		lFilterPatterns,
+		NULL,
+		0);
+    
+    if( !filename )
+        return;
+}
+
+void TinyFDSaveFile(){
+    char* filename = tinyfd_saveFileDialog(
+		"Save Current State",
+		"GlutPaintFile.txt",
+		1,
+		lFilterPatterns,
+		NULL);
+
+    if( !filename )
+        return;
+
+}
+
 void ImGuiPaintDisplay(){
 
     // Start the Dear ImGui frame
@@ -49,6 +78,12 @@ void ImGuiPaintDisplay(){
     // Setup the actual GUI
     ImGui::Begin("Menu");
         ImVec2 size = ImGui::GetItemRectSize();
+
+        if(ImGui::Button("Load File"))
+            TinyFDLoadFile();
+        ImGui::SameLine();
+        if(ImGui::Button("Save in File"))
+            TinyFDSaveFile();
 
         ImGui::Text("Background Color");
         ImGui::ColorEdit3(" ", (float*)&background_color); // Edit 3 floats representing a color
