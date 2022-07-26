@@ -32,6 +32,7 @@ class gpBezier : public gpShape{
 
         gpBezier(int x0, int y0) : gpShape(x0, y0){
             shape = DrawBezier;
+            this->filled = false;
             // t = 1.0f/(float)n_segments;
             vertex.reserve(21);
             vertex.push_back( new int[2]{x0, y0} );
@@ -48,6 +49,15 @@ class gpBezier : public gpShape{
 
         void hardwareRender(){
             glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
+
+            if( vertex.size() <= 2 ){
+                glBegin(GL_LINE);
+                    glVertex2i( vertex[0][0], vertex[0][1]);
+                    glVertex2i( vertex[1][0], vertex[1][1]);
+                glEnd();
+                return;
+            }
+
             glBegin( GL_LINE_STRIP );
             for(size_t i = 0; i<segments.size(); i++)
                 glVertex2i( segments[i][0], segments[i][1] );
@@ -119,7 +129,8 @@ class gpBezier : public gpShape{
                 vertex.push_back( new int[2]{x, y} );
             }
 
-            updateSegments();
+            if( !reading_file )
+                updateSegments();
 
         }
 
@@ -224,7 +235,7 @@ class gpBezier : public gpShape{
             glEnable(GL_LINE_STIPPLE);
             glBegin(GL_LINE_STRIP);
                 for(size_t i = 0; i<vertex.size(); i++)
-                    glVertex2i(vertex[i][0], 720 - vertex[i][1]);    
+                    glVertex2i(vertex[i][0], vertex[i][1]);    
             glEnd();
             glDisable(GL_LINE_STIPPLE);
 

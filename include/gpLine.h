@@ -28,6 +28,7 @@ class gpLine : public gpShape{
 
 		gpLine(int x0, int y0) : gpShape(x0, y0){
 			shape = DrawLine;
+			this->filled = false;
 		}
 
 		gpLine(int x0, int y0, int x1, int y1, ImVec4 color) : gpShape(x0, y0, x1, y1, color){

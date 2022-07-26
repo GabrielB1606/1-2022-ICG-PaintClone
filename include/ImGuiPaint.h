@@ -54,8 +54,105 @@ void TinyFDLoadFile(){
 		NULL,
 		0);
     
-    if( !filename )
+    if( !filename ){
+        tinyfd_messageBox(
+			"Error",
+			"Couldn't open file",
+			"ok",
+			"error",
+			1);
         return;
+    }
+
+    ifstream f( filename );
+    if(!f){
+       tinyfd_messageBox(
+			"Error",
+			"Couldn't open file",
+			"ok",
+			"error",
+			1);
+        return;
+    }
+
+    reading_file = true;
+
+    std::string str;
+
+    GlutPaintCleanup();
+
+    f >> str;
+    if( str.compare("BACKGROUND") == 0 ){
+        f >> background_color.x >> background_color.y >> background_color.z;
+        f >> str;
+    }
+
+    int x, y, n;
+    float r, g, b;
+
+    while( !f.eof() ){
+        
+        f >> x >> y;
+        if( str.find("LINE") != std::string::npos )
+            current_drawing = new gpLine(x, y);
+
+        else if( str.find("BEZIER") != std::string::npos )
+           current_drawing = new gpBezier(x, y);
+
+        else if( str.find("CIRCLE") != std::string::npos )
+           current_drawing = new gpCircle(x, y);
+
+        else if( str.find("ELLIPSE") != std::string::npos )
+           current_drawing = new gpEllipse(x, y);
+
+        else if( str.find("TRIANGLE") != std::string::npos ){
+            current_drawing = new gpTriangle(x, y);
+            f >> x >> y;
+            current_drawing->setVertex(2, x, y);
+        }
+
+        else if( str.find("RECTANGLE") != std::string::npos )
+           current_drawing = new gpRectangle(x, y);
+        
+        current_drawing->setFilled( str.find("FILLED") != std::string::npos );
+
+        if( current_drawing->getShape() == DrawBezier ){
+
+            n = atoi( str.substr(6, str.size() ).c_str() );
+            for(int i = 1; i<n; i++){
+                f >> x >> y;
+                current_drawing->setVertex(i, x, y);
+            }
+
+            ((gpBezier*)current_drawing)->updateSegments();
+
+        }else{
+            f >> x >> y;
+            current_drawing->setVertex(1, x, y);
+        }
+
+        f >> r >> g>> b;
+        current_drawing->setBorderColor( ImVec4(r, g, b, 1) );
+
+        if( current_drawing->isFilled() ){
+            f >> r >> g>> b;
+            current_drawing->setFillColor( ImVec4(r, g, b, 1) );
+        }
+
+        current_drawing->updateBoundingBox();
+        shapes.push_back(current_drawing);
+        
+        // std::cout << "loading... " << current_drawing->getShape() << "\n";
+
+        current_drawing = nullptr;
+
+        if( !f.eof() )
+            f >> str;
+
+    }
+    // std::cout << "final de carga\n";
+    reading_file = false;
+
 }
 
 void TinyFDSaveFile(){
@@ -66,8 +163,15 @@ void TinyFDSaveFile(){
 		lFilterPatterns,
 		NULL);
 
-    if( !filename )
+    if( !filename ){
+        tinyfd_messageBox(
+			"Error",
+			"Couldn't open file",
+			"ok",
+			"error",
+			1);
         return;
+    }
     
     std::stringstream txt;
 
@@ -159,34 +263,39 @@ void ImGuiPaintDisplay(){
         ImGui::Separator();
         ImGui::Text("Properties");
 
-
         if( current_shape != DrawBezier ){
             ImGui::Checkbox("Center Mode", &center_mode);
             ImGui::SameLine();
             HelpMarker("The first point given will be taken as the center.\n\n(Drag while pressing Alt)");
-        }else{
-            if(ImGui::SliderInt("Number of\nSegments", &n_segments, 1, 150) && current_drawing!= nullptr)            // Edit 1 float using a slider from 0.0f to 1.0f
-                ((gpBezier*)current_drawing)->setT(n_segments);
-            ImGui::SameLine();
-            HelpMarker("Number of divisions in the curve. A bigger quantity implies a smoother curve with a penalty in performance.");
         }
 
-        if( current_shape == DrawTriangle ){
-            ImGui::Checkbox("Vertice Mode", &vertice_mode);
-            ImGui::SameLine();
-            HelpMarker("Click three times to define the position of each vertex.");
-        }
+        if(current_drawing != nullptr){
 
-        ImGui::Text("Colors");
+            if( current_drawing->getShape() == DrawBezier ){
+                
+                if(ImGui::SliderInt("Number of\nSegments", &n_segments, 1, 150) )            // Edit 1 float using a slider from 0.0f to 1.0f
+                    ((gpBezier*)current_drawing)->setT(n_segments);
+                ImGui::SameLine();
+                HelpMarker("Number of divisions in the curve. A bigger quantity implies a smoother curve with a penalty in performance.");
+            }
 
-        ImGui::ColorEdit3("Border", (float*)&border_color); // Edit 3 floats representing a color
-        
-        if( current_shape != DrawBezier && current_shape != DrawLine ){
-            if(ImGui::Checkbox("Fill Figure", &filled))
-                current_drawing->setFilled(filled);
+            if( current_drawing->getShape() == DrawTriangle ){
+                ImGui::Checkbox("Vertice Mode", &vertice_mode);
+                ImGui::SameLine();
+                HelpMarker("Click three times to define the position of each vertex.");
+            }
+
+            ImGui::Text("Colors");
+
+            ImGui::ColorEdit3("Border", (float*)&border_color); // Edit 3 floats representing a color
             
-            if(filled)
-                ImGui::ColorEdit3("Fill", (float*)&fill_color); // Edit 3 floats representing a color
+            if( current_shape != DrawBezier && current_shape != DrawLine ){
+                if(ImGui::Checkbox("Fill Figure", &filled))
+                    current_drawing->setFilled(filled);
+                
+                if(filled)
+                    ImGui::ColorEdit3("Fill", (float*)&fill_color); // Edit 3 floats representing a color
+            }
         }
         
     ImGui::End();
