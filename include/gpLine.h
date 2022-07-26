@@ -48,6 +48,31 @@ class gpLine : public gpShape{
 
 		}
 
+		bool onVertex(int x, int y){
+			int dx, dy;
+			// int diff[2] = {x - mouse_pos[0], y - mouse_pos[1]};
+
+			dx = vertex[0][0] - x;
+			if( (ABS(dx)) <= 8 ){
+				dy = vertex[0][1] - y;
+				if( (ABS(dy)) <= 8){
+					setVertex(0, x, y);
+					return true;
+				}
+			}
+
+			dx = vertex[1][0] - x;
+			if( (ABS(dx)) <= 8 ){
+				dy = vertex[1][1] - y;
+				if( (ABS(dy)) <= 8){
+					setVertex(1, x, y);
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		static void draw(int x0, int y0, int x1, int y1, ImVec4 color){
 
 			float point[2];
@@ -128,14 +153,18 @@ class gpLine : public gpShape{
 
 			int sec_axis = (main_axis+1)&1;
 
-			int b = vertex[1][sec_axis] - (int)m*vertex[1][main_axis];
-			int should_be = (int)m*point[main_axis] + b;
+			int b = vertex[1][sec_axis] - m*vertex[1][main_axis];
+			int should_be = m*point[main_axis] + b;
 
 			int d = should_be - point[sec_axis];
 			
+			// std::cout << d << "\n";
+
 			return ABS(d) <= 7;
 			
 		}
+
+		void updateBoundingBox(){}
 
 		void renderBoundingBox(){
 			glColor3f(70, 70, 70);
