@@ -81,7 +81,7 @@ void TinyFDSaveFile(){
     if(f.fail() ){
         tinyfd_messageBox(
 			"Error",
-			"Couln't open file",
+			"Couldn't open file",
 			"ok",
 			"error",
 			1);
