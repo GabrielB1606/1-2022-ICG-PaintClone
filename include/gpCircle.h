@@ -32,6 +32,27 @@ class gpCircle : public gpShape{
 			bounding_box[1][1] += 3;
 		}
 
+		bool onVertex(int x, int y){
+			
+			if( !gpShape::onVertex(x, y) )
+				return false;
+
+			int radius_x = getCenter()[0] - x;
+			int radius_y = getCenter()[1] - y;
+
+			radius_x = ABS(radius_x);
+			radius_y = ABS(radius_y);			
+
+			r = MIN(radius_x, radius_y);
+			vertex[2][0] = (vertex[0][0]+vertex[1][0]) >> 1;
+			vertex[2][1] = (vertex[0][1]+vertex[1][1]) >> 1;
+
+			// updateBoundingBox();
+
+			return true;
+			
+		}
+
 		void setVertex(int n, int x, int y){
 
 			gpShape::setVertex(n,x,y);
