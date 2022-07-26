@@ -143,6 +143,29 @@ class gpEllipse : public gpShape{
 			}
 		}
 
+		bool onVertex(int x, int y){
+			
+			if( !gpShape::onVertex(x, y) )
+				return false;
+
+			rx = getCenter()[0] - x;
+			ry = getCenter()[1] - y;
+
+			rx = ABS(rx);
+			ry = ABS(ry);
+
+			rxrx = rx*rx;
+			ryry = ry*ry;			
+
+			vertex[2][0] = (vertex[0][0]+vertex[1][0]) >> 1;
+			vertex[2][1] = (vertex[0][1]+vertex[1][1]) >> 1;
+
+			// updateBoundingBox();
+
+			return true;
+			
+		}		
+
 		bool onClick(int x, int y){
 
 			if( !gpShape::onClick(x, y) )
