@@ -106,8 +106,7 @@ class gpTriangle : public gpShape{
 			updateBoundingBox();
         }
 
-		void hardwareRenderFill()
-		{
+		void hardwareRenderFill(){
 			glBegin( GL_TRIANGLES );
 				glVertex2i(vertex[0][0], window_height - vertex[0][1]);
 				glVertex2i(vertex[1][0], window_height - vertex[1][1]);

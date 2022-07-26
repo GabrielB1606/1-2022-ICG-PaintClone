@@ -146,6 +146,25 @@ class gpBezier : public gpShape{
 
         }
 
+        bool onVertex(int x, int y){
+			int dx, dy;
+			// int diff[2] = {x - mouse_pos[0], y - mouse_pos[1]};
+
+            for(size_t i = 0; i<vertex.size(); i++){
+                dx = vertex[i][0] - x;
+                if( (ABS(dx)) <= 8 ){
+                    dy = vertex[i][1] - y;
+                    if( (ABS(dy)) <= 8){
+                        setVertex(i, x, y);
+                        return true;
+                    }
+                }
+            }
+
+
+			return false;
+		}
+
         void updateBoundingBox(){
 
             bounding_box[1][0] = bounding_box[0][0] = vertex[0][0];
