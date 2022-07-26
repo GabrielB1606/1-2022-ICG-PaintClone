@@ -153,6 +153,7 @@ void ImGuiPaintDisplay(){
                 current_drawing->select(false);
                 current_drawing = nullptr;
             }
+            filled = true;
         }
 
         ImGui::Separator();
