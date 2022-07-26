@@ -80,9 +80,10 @@ class gpEllipse : public gpShape{
 		}
 
 		void hardwareRender(){
-			glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
-			hardwareRenderFill();
-			
+			if(filled){
+				glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
+				hardwareRenderFill();
+			}
 			glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
 			hardwareRenderBorder();
 		}
@@ -108,10 +109,12 @@ class gpEllipse : public gpShape{
 				glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
 				ellipsePoints(x, y, getCenter());
 
-				glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
-				for(int i = 0; i<y; i++)
-					ellipsePoints(x, i, getCenter());
-					
+				if(filled){
+					glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
+					for(int i = 0; i<y; i++)
+						ellipsePoints(x, i, getCenter());
+				}
+
 				if(d < 0)
 					d += ((ryry * ((x<<1) + 3))<<2);
 				else {
@@ -129,9 +132,11 @@ class gpEllipse : public gpShape{
 				glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
 				ellipsePoints(x, y, getCenter());
 
-				glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
-				for(int i = 0; i<y; i++)
-					ellipsePoints(x, i, getCenter());
+				if(filled){
+					glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
+					for(int i = 0; i<y; i++)
+						ellipsePoints(x, i, getCenter());
+				}
 
 				if( d<0 ){
 					d += (ryry*((x + 1)<<1) + rxrx *(-(y<<1) + 3)) << 2;
@@ -177,9 +182,6 @@ class gpEllipse : public gpShape{
 			int d = (x_h*x_h/rxrx) + (y_k *y_k/ryry);
 
 			return !d;
-		}
-
-		void onMove(int x, int y){
 		}
 
 

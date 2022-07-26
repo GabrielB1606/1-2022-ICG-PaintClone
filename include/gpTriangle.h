@@ -123,9 +123,10 @@ class gpTriangle : public gpShape{
 		}
 
 		void hardwareRender(){
-			glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
-			hardwareRenderFill();
-			
+			if(filled){
+				glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
+				hardwareRenderFill();
+			}
 			glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
 			hardwareRenderBorder();
 		}
@@ -163,8 +164,9 @@ class gpTriangle : public gpShape{
 			int drawing = 0b11;
 
 			while( drawing ){
-
-				gpLine::draw( (int)point[0][0], (int)point[0][1], (int)point[1][0], (int)point[1][1], fill_color );
+				
+				if(filled)
+					gpLine::draw( (int)point[0][0], (int)point[0][1], (int)point[1][0], (int)point[1][1], fill_color );
 
 				glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
 				

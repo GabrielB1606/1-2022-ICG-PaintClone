@@ -19,6 +19,7 @@ static short vertex_dragging = -1;
 static bool center_mode = false;
 static bool vertice_mode = false;
 static bool selection_mode = false;
+static bool filled = true;
 static int mouse_pos[2] = {0, 0};
 static int n_segments = 100;
 
@@ -30,9 +31,9 @@ class gpShape
 		int vertex[3][2];
 		int bounding_box[2][2];
 		bool selected = false;
+		bool filled;
 
 	public:
-
 
 		gpShape(int x0, int y0){
 			vertex[2][0] = vertex[1][0] = vertex[0][0] = x0;
@@ -150,12 +151,12 @@ class gpShape
 		// // este método es invocado solo hacia el objeto "current"
 		// virtual void onMove(int x, int y);
 
-		ImVec4* getBorderColorReference(){
-			return &border_color;
+		ImVec4 getBorderColor(){
+			return border_color;
 		}
 
-		ImVec4* getFillColorReference(){
-			return &fill_color;
+		ImVec4 getFillColor(){
+			return fill_color;
 		}
 
 		// virtual void setVertex(int n, int x, int y) = 0;
@@ -239,31 +240,19 @@ class gpShape
 					bounding_box[i][0] += diff[0];
 					bounding_box[i][1] += diff[1];
 				}
-				// printf("%f %f\n", io.MouseDelta.x, io.MouseDelta.y);
 			}
 
 		}
 
-		float Q_rsqrt( float number ){
-			long i;
-			float x2, y;
-			const float threehalfs = 1.5F;
-
-			x2 = number * 0.5F;
-			y = number;
-			i = *(long*) &y;					//	evil floating point bit hack
-			i = 0x5f3759df - (i>>1);			//	what the fuck?
-			y = *(float *) &i;
-			y = y * (threehalfs - (x2*y*y));	//	1st iteration
-			y = y * (threehalfs - (x2*y*y));	//	2nd iteration, can be removed
-
-			return y;
-
+		bool isFilled(){
+			return filled;
 		}
 
-		// podríamos responder a los eventos del mouse
-		// . todos responden al click, pero solo uno puede
-		// . retornar "yo fui seleccionado"
+		void setFilled(bool f){
+			filled = f;
+		}
+
+		
 };
 
 #endif

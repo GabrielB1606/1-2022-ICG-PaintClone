@@ -154,10 +154,15 @@ void ImGuiPaintDisplay(){
 
         ImGui::Text("Colors");
 
-        if( current_shape != DrawBezier && current_shape != DrawLine )
-            ImGui::ColorEdit3("Fill", (float*)&fill_color); // Edit 3 floats representing a color
-        
         ImGui::ColorEdit3("Border", (float*)&border_color); // Edit 3 floats representing a color
+        
+        if( current_shape != DrawBezier && current_shape != DrawLine ){
+            if(ImGui::Checkbox("Fill Figure", &filled))
+                current_drawing->setFilled(filled);
+            
+            if(filled)
+                ImGui::ColorEdit3("Fill", (float*)&fill_color); // Edit 3 floats representing a color
+        }
         
     ImGui::End();
 

@@ -118,6 +118,9 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
                     current_drawing = shapes[i];
                     current_drawing->select(true);
                     current_drawing_idx = i;
+                    filled = current_drawing->isFilled();
+                    border_color = current_drawing->getBorderColor();
+                    fill_color = current_drawing->getFillColor();
                     // shapes.erase( shapes.begin() + i );
                     // shapes.emplace_back(current_drawing);
                     return;

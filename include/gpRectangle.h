@@ -38,9 +38,11 @@ class gpRectangle : public gpShape{
 		}
 
 		void hardwareRender(){
-			glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
-			hardwareRenderFill();
-			
+			if(filled){
+				glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
+				hardwareRenderFill();
+			}
+
 			glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
 			hardwareRenderBorder();
 		}
@@ -80,12 +82,13 @@ class gpRectangle : public gpShape{
 				putPixel(i, vertex[1][1]);
 			}
 
-			glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
+			if(filled){
+				glColor4f(fill_color.x * fill_color.w, fill_color.y * fill_color.w, fill_color.z * fill_color.w, fill_color.w);
 
-            for(int i = vertex[0][0]+1; i<vertex[1][0]; i++)
-                for(int  j = y0; j<y1; j++)
-                    putPixel(i,j);
-
+				for(int i = vertex[0][0]+1; i<vertex[1][0]; i++)
+					for(int  j = y0; j<y1; j++)
+						putPixel(i,j);
+			}
 		}
 
 };
