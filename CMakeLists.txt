@@ -10,13 +10,18 @@ add_compile_definitions(FREEGLUT_STATIC)
 file( GLOB IMGUI_SRC src/imgui/*.cpp )
 
 # my project
-add_executable(${PROJECT_NAME} src/main.cpp ${IMGUI_SRC})
-target_include_directories( ${PROJECT_NAME} PUBLIC include/ include/imgui )
+add_executable(${PROJECT_NAME} src/main.cpp ${IMGUI_SRC} src/tinyfiledialogs/tinyfiledialogs.c)
+target_include_directories( ${PROJECT_NAME} PUBLIC include/ include/imgui include/tinyfiledialogs)
 target_link_directories( ${PROJECT_NAME} PRIVATE lib/ )
-target_link_libraries(${PROJECT_NAME} freeglut_staticd)
+target_link_libraries(${PROJECT_NAME} freeglut_staticd comdlg32 ole32)
 
 # imgui demo
 add_executable(imgui_demo src/demo/imgui_main.cpp ${IMGUI_SRC})
 target_include_directories( imgui_demo PUBLIC include/ include/imgui )
 target_link_directories( imgui_demo PRIVATE lib/ )
 target_link_libraries(imgui_demo freeglut_staticd)
+
+# tinyfiledialogs demo
+add_executable(tinyfiledialogs_demo src/demo_tfd/hello.c src/tinyfiledialogs/tinyfiledialogs.c)
+target_include_directories(tinyfiledialogs_demo PUBLIC include/tinyfiledialogs)
+target_link_libraries(tinyfiledialogs_demo comdlg32 ole32)
