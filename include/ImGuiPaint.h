@@ -77,6 +77,8 @@ void TinyFDLoadFile(){
 
     reading_file = true;
 
+    glutSetCursor(GLUT_CURSOR_WAIT);
+
     std::string str;
 
     GlutPaintCleanup();
@@ -152,7 +154,7 @@ void TinyFDLoadFile(){
     }
     // std::cout << "final de carga\n";
     reading_file = false;
-
+    glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
 }
 
 void TinyFDSaveFile(){

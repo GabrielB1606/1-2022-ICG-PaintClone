@@ -264,17 +264,30 @@ void GlutPaintPassiveMotionFunc(int x, int y){
     io.AddMousePosEvent((float)x, (float)y);
     if( io.WantCaptureMouse )
         return;
-    if( vertex_dragging != -1 && current_drawing != nullptr )
-        if(  vertice_mode ){
-            if( current_shape == DrawTriangle && vertex_dragging < 3 ){
-                for(int i = vertex_dragging; i<3; i++)
-                    current_drawing->setVertex(i, x, y);
-            }
 
-        }else if( current_shape == DrawBezier && vertex_dragging < 20 ){
-            current_drawing->setVertex(vertex_dragging, x, y);
+    if( current_drawing != nullptr ){
+
+        if( current_drawing->isSelected()){
+            if(current_drawing->onVertex(x, y, false))
+                glutSetCursor(GLUT_CURSOR_INFO);
+            else if(current_drawing->onClick(x, y) )
+                glutSetCursor(GLUT_CURSOR_CYCLE);
+        }else{
+            glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
         }
 
+        if( vertex_dragging != -1 && current_drawing != nullptr )
+            if(  vertice_mode ){
+                if( current_shape == DrawTriangle && vertex_dragging < 3 ){
+                    for(int i = vertex_dragging; i<3; i++)
+                        current_drawing->setVertex(i, x, y);
+                }
+
+            }else if( current_shape == DrawBezier && vertex_dragging < 20 ){
+                current_drawing->setVertex(vertex_dragging, x, y);
+            }
+    
+    }
 }
 
 void GlutPaintReshapeFunc(int w, int h){

@@ -190,7 +190,7 @@ class gpShape
 			vertex[2][1] = y;
 		}
 		
-		virtual bool onVertex(int x, int y){
+		virtual bool onVertex(int x, int y, bool move = true){
 			int dx, dy;
 			// int diff[2] = {x - mouse_pos[0], y - mouse_pos[1]};
 
@@ -198,14 +198,18 @@ class gpShape
 			if( (ABS(dx)) <= 8 ){
 				dy = vertex[0][1] - y;
 				if( (ABS(dy)) <= 8){
-					vertex[0][0] = x;
-					vertex[0][1] = y;
+					if(move){
+						vertex[0][0] = x;
+						vertex[0][1] = y;
+					}
 					return true;
 				}
 				dy = vertex[1][1] - y;
 				if( (ABS(dy)) <= 8){
-					vertex[0][0] = x;
-					vertex[1][1] = y;
+					if(move){
+						vertex[0][0] = x;
+						vertex[1][1] = y;
+					}
 					return true;
 				}
 			}
@@ -214,14 +218,18 @@ class gpShape
 			if( (ABS(dx)) <= 8 ){
 				dy = vertex[0][1] - y;
 				if( (ABS(dy)) <= 8){
-					vertex[1][0] = x;
-					vertex[0][1] = y;
+					if(move){
+						vertex[1][0] = x;
+						vertex[0][1] = y;
+					}
 					return true;
 				}
 				dy = vertex[1][1] - y;
 				if( (ABS(dy)) <= 8){
-					vertex[1][0] = x;
-					vertex[1][1] = y;
+					if(move){
+						vertex[1][0] = x;
+						vertex[1][1] = y;
+					}
 					return true;
 				}
 			}
