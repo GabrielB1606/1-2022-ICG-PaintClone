@@ -2,7 +2,7 @@
 
 GitHub repository: https://github.com/GabrielB1606/1-2022-ICG-PaintClone
 
-Compile with CMake (at least version 3.0.0).
+Compile with CMake (at least version 3.0.0) and Visual Studio compiler.
 
 ## Basics
 Select a shape and drag the mouse just like paint.
