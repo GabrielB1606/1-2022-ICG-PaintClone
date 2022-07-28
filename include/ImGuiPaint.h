@@ -9,39 +9,32 @@ void ImGuiPaintInit(){
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
-    //ImGui::StyleColorsClassic();
 
-    // Setup Platform/Renderer backends
-    // FIXME: Consider reworking this example to install our own GLUT funcs + forward calls ImGui_ImplGLUT_XXX ones, instead of using ImGui_ImplGLUT_InstallFuncs().
     ImGui_ImplGLUT_Init();
     ImGui_ImplGLUT_InstallFuncs();
     ImGui_ImplOpenGL2_Init();
 
 }
 
-void ImGuiPaintMotionFunc(int x, int y){
-    ImGuiIO& io = ImGui::GetIO();
-    io.AddMousePosEvent((float)x, (float)y);
-}
 
-static void HelpMarker(const char* desc)
-{
+// yanked code from the ImGui demo, (?) icon that shows text when hover
+static void HelpMarker(const char* desc){
+
     ImGui::TextDisabled("(?)");
-    if (ImGui::IsItemHovered())
-    {
+    if (ImGui::IsItemHovered()){
         ImGui::BeginTooltip();
         ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
         ImGui::TextUnformatted(desc);
         ImGui::PopTextWrapPos();
         ImGui::EndTooltip();
     }
+
 }
 
-
+// display function for ImGui menu
 void ImGuiPaintDisplay(){
 
     // Start the Dear ImGui frame
@@ -50,22 +43,26 @@ void ImGuiPaintDisplay(){
 
     // Setup the actual GUI
     ImGui::Begin("Menu");
-        ImVec2 size = ImGui::GetItemRectSize();
+        ImVec2 size = ImVec2(200, 700);
 
+        // File management buttons
         if(ImGui::Button("Load File"))
             TinyFDLoadFile();
         ImGui::SameLine();
         if(ImGui::Button("Save in File"))
             TinyFDSaveFile();
 
+        // General scene config
         ImGui::Text("Background Color");
         ImGui::ColorEdit3(" ", (float*)&background_color); // Edit 3 floats representing a color
-
         ImGui::Checkbox("Hardware Mode", &hardware_mode);
 
+        // General tools to modify shapes position
         ImGui::Separator();
         ImGui::Text("Tools");
         ImGui::Checkbox("Selection Mode", &selection_mode);
+        ImGui::SameLine();
+        HelpMarker("Click a shape to change it's properties.");
 
         if(ImGui::Button("Delete"))
             GlutPaintDeleteCurrent();
@@ -86,11 +83,8 @@ void ImGuiPaintDisplay(){
             GlutPaintMoveBack();
 
         ImGui::Separator();
-        // ImGui::Text("Draw");
-
+        // Select shape to draw
         ImGui::Text("Shape");
-        ImGui::SameLine();
-        HelpMarker("Ayuda");
         const char* shapes[] = { 
             "Line",
             "Circle",
@@ -109,19 +103,20 @@ void ImGuiPaintDisplay(){
         }
 
         ImGui::Separator();
+        // Modify selected shape properties
         ImGui::Text("Properties");
 
-        if( current_shape != DrawBezier ){
+        if( (current_shape != DrawBezier && current_shape != DrawTriangle && current_drawing == nullptr) || ( current_drawing != nullptr && current_drawing->getShape() != DrawBezier && current_drawing->getShape() != DrawTriangle) ){
             ImGui::Checkbox("Center Mode", &center_mode);
             ImGui::SameLine();
-            HelpMarker("The first point given will be taken as the center.\n\n(Drag while pressing Alt)");
+            HelpMarker("The first point given will be taken as the center.");
         }
 
         if(current_drawing != nullptr){
 
             if( current_drawing->getShape() == DrawBezier ){
                 
-                if(ImGui::SliderInt("Number of\nSegments", &n_segments, 1, 150) )            // Edit 1 float using a slider from 0.0f to 1.0f
+                if(ImGui::SliderInt("Number of\nSegments", &n_segments, 1, 100) )            // Edit 1 float using a slider from 0.0f to 1.0f
                     ((gpBezier*)current_drawing)->setT(n_segments);
                 ImGui::SameLine();
                 HelpMarker("Number of divisions in the curve. A bigger quantity implies a smoother curve with a penalty in performance.");

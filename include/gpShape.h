@@ -5,17 +5,10 @@
 #include <sstream>
 
 #include "GL/freeglut.h"
-#include "imgui.h"
-
-#define ROUNDNUM(x) ((int)( (x) >= .5f ? ((x)+1.0f) : (x) )) 
-#define MIN(x, y) ( (x) >= (y) ? (y) : (x) ) 
-#define MAX(x, y) ( (x) >= (y) ? (x) : (y) ) 
-#define ABS(x) ( (x) < 0 ? -1*(x) : (x) )
-#define MOD_INC(x, y) ( (x)+1 == (y) ? 0 : (x)+1 )
-#define MOD_DEC(x, y) ( (x)-1 < 0 ? (y)-1 : (x)-1 )
 
 using namespace std;
 
+// global variables that affect shapes properties
 static short vertex_dragging = -1;
 static bool center_mode = false;
 static bool vertice_mode = false;
@@ -23,10 +16,9 @@ static bool selection_mode = false;
 static bool reading_file = false;
 static bool filled = true;
 static int mouse_pos[2] = {0, 0};
-static int n_segments = 100;
+static int n_segments = 50;
 
-class gpShape
-{
+class gpShape{
 
 	protected:
 		ImVec4 border_color, fill_color;
@@ -75,11 +67,9 @@ class gpShape
 
 		static void putPixel(int x, int y){
 			
-			// ImGuiIO& io = ImGui::GetIO();
-
-			glPointSize(1.5f);
+			glPointSize(1.5f);	// for some reason if i don't have this point size my pc won't draw a thing
 			glBegin(GL_POINTS);
-			glVertex2i(x,   y);
+			glVertex2i(x, y);	
 			glEnd();
 		}
 

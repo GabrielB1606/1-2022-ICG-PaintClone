@@ -26,20 +26,17 @@ static int window_width = 1280, window_height = 720;
 #include "gpEllipse.h"
 #include "gpBezier.h"
 
-// window global variables
-
+// coloor of the bkg
 static ImVec4 background_color = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
 
-// drawing global variables
-static ImVec4 fill_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
-static ImVec4 border_color = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
-static int current_shape = 0;
-deque<gpShape*> shapes;
-gpShape* current_drawing = nullptr;
-int current_drawing_idx = -1;
-// static short vertex_dragging = -1;
 
-// drawing modes
+static ImVec4 fill_color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);  // color of the fill of a shape
+static ImVec4 border_color = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);// color of the border of a shape
+static int current_shape = 0;       // type of shape currently drawing
+deque<gpShape*> shapes;             // Deque of shapes
+gpShape* current_drawing = nullptr; // pointer to the shape currently drawing
+int current_drawing_idx = -1;       // index of current shape in deque
+
 static bool hardware_mode = true;
 
 void GlutPaintInit();
@@ -68,7 +65,7 @@ void GlutPaintInit(){
 	glViewport(0, 0, window_width, window_height);	
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, window_width, window_height, 0, -1, 1);
+	glOrtho(0, window_width, window_height, 0, -1, 1); // glOrtho with inverted vertical limits so i can save the windows_height-y operation
 
 }
 
@@ -81,7 +78,6 @@ void GlutPaintDisplay(){
     
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // glClearColor(1, 1, 1, 1);
     glClear(GL_COLOR_BUFFER_BIT);
     glFlush();
 
@@ -133,8 +129,6 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
                     filled = current_drawing->isFilled();
                     border_color = current_drawing->getBorderColor();
                     fill_color = current_drawing->getFillColor();
-                    // shapes.erase( shapes.begin() + i );
-                    // shapes.emplace_back(current_drawing);
                     return;
                 }
             if(current_drawing != nullptr){
@@ -217,9 +211,6 @@ void GlutPaintMouseFunc(int glut_button, int state, int x, int y){
                         break;
                 }
             }
-            // if(center_mode)
-            //     current_drawing->setCenter(x,y);
-            // fill_color = current_drawing->getColorReference();
 
         }else if( glut_button == GLUT_RIGHT_BUTTON && DrawBezier == current_shape ){
             vertex_dragging = -1;
@@ -321,13 +312,26 @@ void GlutPaintReshapeFunc(int w, int h){
 }
 
 void GlutPaintKeyboardFunc(unsigned char c, int x, int y){
-    // Send character to imgui
-    //printf("char_down_func %d '%c'\n", c, c);
-    // ImGuiIO& io = ImGui::GetIO();
-    // if (c >= 32)
-    //     io.AddInputCharacter((unsigned int)c);
 
     switch (c){
+        case '1':
+            current_shape = DrawLine;
+            break;
+        case '2':
+            current_shape = DrawCircle;
+            break;
+        case '3':
+            current_shape = DrawEllipse;
+            break;
+        case '4':
+            current_shape = DrawRectangle;
+            break;
+        case '5':
+            current_shape = DrawTriangle;
+            break;
+        case '6':
+            current_shape = DrawBezier;
+            break;
         case 'x': case 'X':
             GlutPaintCleanup();
             break;
@@ -484,10 +488,16 @@ void TinyFDLoadFile(){
 
     int x, y, n;
     float r, g, b;
+    bool filled;
 
     while( !f.eof() ){
         
+        filled = str.compare("FILLED") == 0;
+        if(filled)
+            f >> str;
+
         f >> x >> y;
+
         if( str.find("LINE") != std::string::npos )
             current_drawing = new gpLine(x, y);
 
@@ -509,7 +519,7 @@ void TinyFDLoadFile(){
         else if( str.find("RECTANGLE") != std::string::npos )
            current_drawing = new gpRectangle(x, y);
         
-        current_drawing->setFilled( str.find("FILLED") != std::string::npos );
+        current_drawing->setFilled( filled || str.find("FILLED") != std::string::npos );
 
         if( current_drawing->getShape() == DrawBezier ){
 
