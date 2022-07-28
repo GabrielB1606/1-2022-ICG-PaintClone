@@ -70,25 +70,30 @@ class gpLine : public gpShape{
 			// int diff[2] = {x - mouse_pos[0], y - mouse_pos[1]};
 
 			dx = vertex[0][0] - x;
-			if( (ABS(dx)) <= 8 ){
+			if( (ABS(dx)) <= 5 ){
 				dy = vertex[0][1] - y;
-				if( (ABS(dy)) <= 8){
-					if(move)
+				if( (ABS(dy)) <= 5){
+					if(move){
 						setVertex(0, x, y);
+						vertex_dragging = -1;
+					}
 					return true;
 				}
 			}
 
 			dx = vertex[1][0] - x;
-			if( (ABS(dx)) <= 8 ){
+			if( (ABS(dx)) <= 5 ){
 				dy = vertex[1][1] - y;
-				if( (ABS(dy)) <= 8){
-					if(move)
+				if( (ABS(dy)) <= 5){
+					if(move){
 						setVertex(1, x, y);
+						vertex_dragging = -1;
+					}
 					return true;
 				}
 			}
 
+			vertex_dragging = -1;
 			return false;
 		}
 
@@ -167,7 +172,7 @@ class gpLine : public gpShape{
 		{
 			int point[] = {x, y};
 
-			if(point[main_axis]+5 < vertex[0][main_axis] || point[main_axis]-5 > vertex[1][main_axis]  )
+			if(point[main_axis] < vertex[0][main_axis] || point[main_axis] > vertex[1][main_axis]  )
 				return false;
 
 			int sec_axis = (main_axis+1)&1;
@@ -179,7 +184,7 @@ class gpLine : public gpShape{
 			
 			// std::cout << d << "\n";
 
-			return ABS(d) <= 7;
+			return ABS(d) <= 10;
 			
 		}
 
