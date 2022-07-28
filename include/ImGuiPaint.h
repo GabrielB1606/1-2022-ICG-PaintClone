@@ -101,6 +101,9 @@ void ImGuiPaintDisplay(){
             }
             filled = true;
         }
+        if( current_shape == DrawBezier ){
+            ImGui::Text("Use left click to set\nyour last control point.");
+        }
 
         ImGui::Separator();
         // Modify selected shape properties
