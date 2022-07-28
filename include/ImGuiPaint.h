@@ -2,8 +2,6 @@
 #define IMGUI_PAINT_H
 
 #include "GlutPaint.h"
-#include "tinyfiledialogs.h"
-#include <fstream>
 
 
 void ImGuiPaintInit(){
@@ -43,161 +41,6 @@ static void HelpMarker(const char* desc)
     }
 }
 
-char const * lFilterPatterns[1] = { "*.txt"};
-
-void TinyFDLoadFile(){
-    char* filename = tinyfd_openFileDialog(
-		"Load File",
-		"",
-		1,
-		lFilterPatterns,
-		NULL,
-		0);
-    
-    if( !filename ){
-        tinyfd_messageBox(
-			"Error",
-			"Couldn't open file",
-			"ok",
-			"error",
-			1);
-        return;
-    }
-
-    ifstream f( filename );
-    if(!f){
-       tinyfd_messageBox(
-			"Error",
-			"Couldn't open file",
-			"ok",
-			"error",
-			1);
-        return;
-    }
-
-    reading_file = true;
-
-    glutSetCursor(GLUT_CURSOR_WAIT);
-
-    std::string str;
-
-    GlutPaintCleanup();
-
-    f >> str;
-    if( str.compare("BACKGROUND") == 0 ){
-        f >> background_color.x >> background_color.y >> background_color.z;
-        f >> str;
-    }
-
-    int x, y, n;
-    float r, g, b;
-
-    while( !f.eof() ){
-        
-        f >> x >> y;
-        if( str.find("LINE") != std::string::npos )
-            current_drawing = new gpLine(x, y);
-
-        else if( str.find("BEZIER") != std::string::npos )
-           current_drawing = new gpBezier(x, y);
-
-        else if( str.find("CIRCLE") != std::string::npos )
-           current_drawing = new gpCircle(x, y);
-
-        else if( str.find("ELLIPSE") != std::string::npos )
-           current_drawing = new gpEllipse(x, y);
-
-        else if( str.find("TRIANGLE") != std::string::npos ){
-            current_drawing = new gpTriangle(x, y);
-            f >> x >> y;
-            current_drawing->setVertex(2, x, y);
-        }
-
-        else if( str.find("RECTANGLE") != std::string::npos )
-           current_drawing = new gpRectangle(x, y);
-        
-        current_drawing->setFilled( str.find("FILLED") != std::string::npos );
-
-        if( current_drawing->getShape() == DrawBezier ){
-
-            n = atoi( str.substr(6, str.size() ).c_str() );
-            for(int i = 1; i<n; i++){
-                f >> x >> y;
-                current_drawing->setVertex(i, x, y);
-            }
-
-            ((gpBezier*)current_drawing)->updateSegments();
-
-        }else{
-            f >> x >> y;
-            current_drawing->setVertex(1, x, y);
-        }
-
-        f >> r >> g>> b;
-        current_drawing->setBorderColor( ImVec4(r, g, b, 1) );
-
-        if( current_drawing->isFilled() ){
-            f >> r >> g>> b;
-            current_drawing->setFillColor( ImVec4(r, g, b, 1) );
-        }
-
-        current_drawing->updateBoundingBox();
-        shapes.push_back(current_drawing);
-        
-        // std::cout << "loading... " << current_drawing->getShape() << "\n";
-
-        current_drawing = nullptr;
-
-        if( !f.eof() )
-            f >> str;
-
-    }
-    // std::cout << "final de carga\n";
-    reading_file = false;
-    glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
-}
-
-void TinyFDSaveFile(){
-    char* filename = tinyfd_saveFileDialog(
-		"Save Current State",
-		"GlutPaintFile.txt",
-		1,
-		lFilterPatterns,
-		NULL);
-
-    if( !filename ){
-        tinyfd_messageBox(
-			"Error",
-			"Couldn't open file",
-			"ok",
-			"error",
-			1);
-        return;
-    }
-    
-    std::stringstream txt;
-
-    txt << "BACKGROUND "<<background_color.x << " " << background_color.y << " " << background_color.z << "\n";
-
-    for( size_t i = 0; i < shapes.size(); i++ )
-        txt << shapes[i]->toString() << "\n";
-    
-    ofstream f( filename );
-
-    if(f.fail() ){
-        tinyfd_messageBox(
-			"Error",
-			"Couldn't open file",
-			"ok",
-			"error",
-			1);
-        return;
-    }
-
-    f << txt.str();
-    f.close();
-
-}
 
 void ImGuiPaintDisplay(){
 
@@ -226,6 +69,9 @@ void ImGuiPaintDisplay(){
 
         if(ImGui::Button("Delete"))
             GlutPaintDeleteCurrent();
+        ImGui::SameLine();
+        if(ImGui::Button("Clean Screen"))
+            GlutPaintCleanup();
 
         if(ImGui::Button("Move Up"))
             GlutPaintMoveUp();

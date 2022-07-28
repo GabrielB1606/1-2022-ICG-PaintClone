@@ -4,8 +4,16 @@
 #include <deque>
 #include <algorithm>
 #include <math.h>
+#include <fstream>
 
 #include "GL/freeglut.h"
+
+#include "imgui.h"
+#include "imgui_impl_glut.h"
+#include "imgui_impl_opengl2.h"
+
+// #include "GlutPaint.h"
+#include "tinyfiledialogs.h"
 
 static int window_width = 1280, window_height = 720; 
 
@@ -44,7 +52,11 @@ void GlutPaintMoveUp();
 void GlutPaintMoveDown();
 void GlutPaintMoveFront();
 void GlutPaintMoveBack();
+void GlutPaintDeleteCurrent();
 void GlutPaintReshapeFunc(int w, int h);
+
+void TinyFDSaveFile();
+void TinyFDLoadFile();
 
 
 void GlutPaintInit(){
@@ -272,6 +284,8 @@ void GlutPaintPassiveMotionFunc(int x, int y){
                 glutSetCursor(GLUT_CURSOR_INFO);
             else if(current_drawing->onClick(x, y) )
                 glutSetCursor(GLUT_CURSOR_CYCLE);
+            else
+                glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
         }else{
             glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
         }
@@ -287,6 +301,8 @@ void GlutPaintPassiveMotionFunc(int x, int y){
                 current_drawing->setVertex(vertex_dragging, x, y);
             }
     
+    }else{
+        glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
     }
 }
 
@@ -304,25 +320,76 @@ void GlutPaintReshapeFunc(int w, int h){
     // GlutPaintDisplay();
 }
 
+void GlutPaintKeyboardFunc(unsigned char c, int x, int y){
+    // Send character to imgui
+    //printf("char_down_func %d '%c'\n", c, c);
+    // ImGuiIO& io = ImGui::GetIO();
+    // if (c >= 32)
+    //     io.AddInputCharacter((unsigned int)c);
+
+    switch (c){
+        case 'x': case 'X':
+            GlutPaintCleanup();
+            break;
+        case 'h': case 'H':
+            hardware_mode = !hardware_mode;
+            break;
+        case 'f': case 'F':
+            GlutPaintMoveFront();
+            break;
+        case 'b': case 'B':
+            GlutPaintMoveBack();
+            break;
+        case '+':
+            GlutPaintMoveUp();
+            break;
+        case '-':
+            GlutPaintMoveDown();
+            break;
+        case 'u': case 'U':
+            if( current_drawing != nullptr )
+                current_drawing->select(false);
+            current_drawing = nullptr;
+            break;
+        case 127:
+            GlutPaintDeleteCurrent();
+            break;
+        case 's': case 'S':
+            TinyFDSaveFile();
+            break;
+        case 'l': case 'L':
+            TinyFDLoadFile();
+            break;
+
+        default:
+            break;
+    }
+
+    (void)x; (void)y; // Unused
+
+}
+
 void GlutPaintInstallFuncs(){
     glutMouseFunc(GlutPaintMouseFunc);
     glutMotionFunc(GlutPaintMotionFunc);
     glutPassiveMotionFunc( GlutPaintPassiveMotionFunc );
     glutReshapeFunc(GlutPaintReshapeFunc);
+    glutKeyboardFunc(GlutPaintKeyboardFunc);
 }
 
 void GlutPaintCleanup(){
 
     for(gpShape* shape: shapes)
         delete shape;
+    shapes.clear();
+    current_drawing = nullptr;
 
 }
 
 void GlutPaintDeleteCurrent(){
 
-    if( shapes.size() ){
-        current_drawing = shapes.back();
-        shapes.pop_back();
+    if( current_drawing != nullptr ){
+        shapes.erase( shapes.begin() + current_drawing_idx );
         delete current_drawing;
         current_drawing = nullptr;
     }
@@ -366,6 +433,162 @@ void GlutPaintMoveBack(){
     shapes.erase( shapes.begin()+current_drawing_idx );
     shapes.push_front( current_drawing );
     current_drawing_idx = 0;
+
+}
+
+char const * lFilterPatterns[1] = { "*.txt"};
+
+void TinyFDLoadFile(){
+    char* filename = tinyfd_openFileDialog(
+		"Load File",
+		"",
+		1,
+		lFilterPatterns,
+		NULL,
+		0);
+    
+    if( !filename ){
+        tinyfd_messageBox(
+			"Error",
+			"Couldn't open file",
+			"ok",
+			"error",
+			1);
+        return;
+    }
+
+    ifstream f( filename );
+    if(!f){
+       tinyfd_messageBox(
+			"Error",
+			"Couldn't open file",
+			"ok",
+			"error",
+			1);
+        return;
+    }
+
+    reading_file = true;
+
+    glutSetCursor(GLUT_CURSOR_WAIT);
+
+    std::string str;
+
+    GlutPaintCleanup();
+
+    f >> str;
+    if( str.compare("BACKGROUND") == 0 ){
+        f >> background_color.x >> background_color.y >> background_color.z;
+        f >> str;
+    }
+
+    int x, y, n;
+    float r, g, b;
+
+    while( !f.eof() ){
+        
+        f >> x >> y;
+        if( str.find("LINE") != std::string::npos )
+            current_drawing = new gpLine(x, y);
+
+        else if( str.find("BEZIER") != std::string::npos )
+           current_drawing = new gpBezier(x, y);
+
+        else if( str.find("CIRCLE") != std::string::npos )
+           current_drawing = new gpCircle(x, y);
+
+        else if( str.find("ELLIPSE") != std::string::npos )
+           current_drawing = new gpEllipse(x, y);
+
+        else if( str.find("TRIANGLE") != std::string::npos ){
+            current_drawing = new gpTriangle(x, y);
+            f >> x >> y;
+            current_drawing->setVertex(2, x, y);
+        }
+
+        else if( str.find("RECTANGLE") != std::string::npos )
+           current_drawing = new gpRectangle(x, y);
+        
+        current_drawing->setFilled( str.find("FILLED") != std::string::npos );
+
+        if( current_drawing->getShape() == DrawBezier ){
+
+            n = atoi( str.substr(6, str.size() ).c_str() );
+            for(int i = 1; i<n; i++){
+                f >> x >> y;
+                current_drawing->setVertex(i, x, y);
+            }
+
+            ((gpBezier*)current_drawing)->updateSegments();
+
+        }else{
+            f >> x >> y;
+            current_drawing->setVertex(1, x, y);
+        }
+
+        f >> r >> g>> b;
+        current_drawing->setBorderColor( ImVec4(r, g, b, 1) );
+
+        if( current_drawing->isFilled() ){
+            f >> r >> g>> b;
+            current_drawing->setFillColor( ImVec4(r, g, b, 1) );
+        }
+
+        current_drawing->updateBoundingBox();
+        shapes.push_back(current_drawing);
+        
+        // std::cout << "loading... " << current_drawing->getShape() << "\n";
+
+        current_drawing = nullptr;
+
+        if( !f.eof() )
+            f >> str;
+
+    }
+    // std::cout << "final de carga\n";
+    reading_file = false;
+    glutSetCursor(GLUT_CURSOR_LEFT_ARROW);
+}
+
+void TinyFDSaveFile(){
+    char* filename = tinyfd_saveFileDialog(
+		"Save Current State",
+		"GlutPaintFile.txt",
+		1,
+		lFilterPatterns,
+		NULL);
+
+    if( !filename ){
+        tinyfd_messageBox(
+			"Error",
+			"Couldn't open file",
+			"ok",
+			"error",
+			1);
+        return;
+    }
+    
+    std::stringstream txt;
+
+    txt << "BACKGROUND "<<background_color.x << " " << background_color.y << " " << background_color.z << "\n";
+
+    for( size_t i = 0; i < shapes.size(); i++ )
+        txt << shapes[i]->toString() << "\n";
+    
+    ofstream f( filename );
+
+    if(f.fail() ){
+        tinyfd_messageBox(
+			"Error",
+			"Couldn't open file",
+			"ok",
+			"error",
+			1);
+        return;
+    }
+
+    f << txt.str();
+    f.close();
 
 }
 

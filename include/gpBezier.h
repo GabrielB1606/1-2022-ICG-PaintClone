@@ -48,9 +48,13 @@ class gpBezier : public gpShape{
         }
 
         void hardwareRender(){
+
+            if(vertex.size()<=1)
+                return;
+
             glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
 
-            if( vertex.size() <= 2 ){
+            if( vertex.size() == 2 ){
                 glBegin(GL_LINE);
                     glVertex2i( vertex[0][0], vertex[0][1]);
                     glVertex2i( vertex[1][0], vertex[1][1]);
