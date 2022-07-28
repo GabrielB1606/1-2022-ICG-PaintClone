@@ -65,7 +65,7 @@ class gpLine : public gpShape{
 
 		}
 
-		bool onVertex(int x, int y){
+		bool onVertex(int x, int y, bool move= true){
 			int dx, dy;
 			// int diff[2] = {x - mouse_pos[0], y - mouse_pos[1]};
 
@@ -73,7 +73,8 @@ class gpLine : public gpShape{
 			if( (ABS(dx)) <= 8 ){
 				dy = vertex[0][1] - y;
 				if( (ABS(dy)) <= 8){
-					setVertex(0, x, y);
+					if(move)
+						setVertex(0, x, y);
 					return true;
 				}
 			}
@@ -82,7 +83,8 @@ class gpLine : public gpShape{
 			if( (ABS(dx)) <= 8 ){
 				dy = vertex[1][1] - y;
 				if( (ABS(dy)) <= 8){
-					setVertex(1, x, y);
+					if(move)
+						setVertex(1, x, y);
 					return true;
 				}
 			}

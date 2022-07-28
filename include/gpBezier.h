@@ -177,7 +177,7 @@ class gpBezier : public gpShape{
 
         }
 
-        bool onVertex(int x, int y){
+        bool onVertex(int x, int y, bool move = true){
 			int dx, dy;
 			// int diff[2] = {x - mouse_pos[0], y - mouse_pos[1]};
 
@@ -186,7 +186,8 @@ class gpBezier : public gpShape{
                 if( (ABS(dx)) <= 8 ){
                     dy = vertex[i][1] - y;
                     if( (ABS(dy)) <= 8){
-                        setVertex(i, x, y);
+                        if(move)
+                            setVertex(i, x, y);
                         return true;
                     }
                 }
