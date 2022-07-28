@@ -1,7 +1,5 @@
 #include <stdio.h>
 
-#include "GL/freeglut.h"
-
 // macros n stuff
 #define ROUNDNUM(x) ((int)( (x) >= .5f ? ((x)+1.0f) : (x) )) // cast float -> int rounding
 #define MIN(x, y) ( (x) >= (y) ? (y) : (x) )
@@ -9,10 +7,6 @@
 #define ABS(x) ( (x) < 0 ? -1*(x) : (x) ) // get absolute value
 #define MOD_INC(x, y) ( ((x)+1) == (y) ? 0 : (x)+1 ) // (x+1)%y
 #define MOD_DEC(x, y) ( ((x)-1) < 0 ? (y)-1 : (x)-1 ) // if (x-1)<0, returns y-1 
-
-#include "imgui.h"
-#include "imgui_impl_glut.h"
-#include "imgui_impl_opengl2.h"
 
 #include "ImGuiPaint.h"
 
@@ -23,19 +17,15 @@ int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
 
-    //  initialize paint things 
-    GlutPaintInit();
+    GlutPaintInit(); //  initialize paint things 
 
     glutDisplayFunc(display);
 
-    // initialize ImGui things
-    ImGuiPaintInit();
+    ImGuiPaintInit(); // initialize ImGui things
 
-    // call clean up functions before closing
-    glutCloseFunc(cleanup);
+    glutCloseFunc(cleanup); // call clean up functions before closing
 
-    // event handlers
-    GlutPaintInstallFuncs();
+    GlutPaintInstallFuncs(); // event handlers
 
     glutMainLoop();
 
@@ -44,11 +34,8 @@ int main(int argc, char** argv)
 
 void display(){
     
-    // Display ImGui
-    ImGuiPaintDisplay();
-
-    // Display Paint
-    GlutPaintDisplay();
+    ImGuiPaintDisplay(); // Display ImGui
+    GlutPaintDisplay(); // Display Paint
     
     ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 
@@ -57,7 +44,6 @@ void display(){
 }
 
 void cleanup(){
-
     // Paint clean up
     GlutPaintCleanup();
 

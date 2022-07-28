@@ -27,13 +27,11 @@ class gpBezier : public gpShape{
 			sstr << border_color.x << " " << border_color.y << " " << border_color.z;
 
 			return sstr.str();
-
 		}	
 
         gpBezier(int x0, int y0) : gpShape(x0, y0){
             shape = DrawBezier;
             this->filled = false;
-            // t = 1.0f/(float)n_segments;
             vertex.reserve(21);
             vertex.push_back( new int[2]{x0, y0} );
         }
@@ -48,13 +46,12 @@ class gpBezier : public gpShape{
         }
 
         void hardwareRender(){
-
             if(vertex.size()<=1)
                 return;
 
             glColor4f(border_color.x * border_color.w, border_color.y * border_color.w, border_color.z * border_color.w, border_color.w);
 
-            if( vertex.size() == 2 ){
+            if( vertex.size() <= 2 ){
                 glBegin(GL_LINE);
                     glVertex2i( vertex[0][0], vertex[0][1]);
                     glVertex2i( vertex[1][0], vertex[1][1]);
@@ -74,14 +71,20 @@ class gpBezier : public gpShape{
             updateSegments();
         }
 
+        // generate points between the control points that will be connected with line segments to draw the curve
         void updateSegments(){
-
-            if( vertex.size() <=2 )
+            if( vertex.size() <=1 )
                 return;
 
             while( segments.size() ){
                 delete segments.back();
                 segments.pop_back();
+            }
+            
+            if( vertex.size() == 2 ){
+                segments.push_back( new int[2]{vertex[0][0], vertex[0][1]} );
+                segments.push_back( new int[2]{vertex[1][0], vertex[1][1]} );
+                return;
             }
 
             int x0, x1, y0, y1;
@@ -101,8 +104,6 @@ class gpBezier : public gpShape{
                 delete ht;
 
             }
-
-            // updateBoundingBox();
         }
 
         void softwareRender(){
@@ -117,7 +118,6 @@ class gpBezier : public gpShape{
             
             for(size_t i = 1; i<segments.size(); i++)
                 gpLine::draw( segments[i-1][0], segments[i-1][1], segments[i][0], segments[i][1], border_color );
-
         }
 
         void setVertex(int n, int x, int y){
@@ -129,7 +129,6 @@ class gpBezier : public gpShape{
                 vertex[n][0] = x;
                 vertex[n][1] = y;
             }else{
-                // printf("push vector size = %d, n = %d\n", vertex.size(), n);
                 vertex.push_back( new int[2]{x, y} );
             }
 
@@ -142,14 +141,12 @@ class gpBezier : public gpShape{
             if( !gpShape::onClick(x, y) )
                 return false;
 
-            // printf("in bounding\n");
-
             int dx, dy;
 
             for(size_t i = 0; i<segments.size(); i++){
                 dx = segments[i][0] - x;
                 dy = segments[i][1] - y;
-                if( (dx*dx + dy*dy) <= (25) )
+                if( (dx*dx + dy*dy) <= (49) )
                     return true;
             }
 

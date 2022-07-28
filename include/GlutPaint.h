@@ -443,6 +443,7 @@ void GlutPaintMoveBack(){
 char const * lFilterPatterns[1] = { "*.txt"};
 
 void TinyFDLoadFile(){
+    vertex_dragging = -1;
     char* filename = tinyfd_openFileDialog(
 		"Load File",
 		"",
@@ -561,6 +562,7 @@ void TinyFDLoadFile(){
 }
 
 void TinyFDSaveFile(){
+    vertex_dragging = -1;
     char* filename = tinyfd_saveFileDialog(
 		"Save Current State",
 		"GlutPaintFile.txt",

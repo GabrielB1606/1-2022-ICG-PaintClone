@@ -11,7 +11,6 @@ class gpTriangle : public gpShape{
 		float m[2];
 
 	public:
-
 		std::string toString(){
 			std::stringstream sstr;
 
@@ -29,7 +28,6 @@ class gpTriangle : public gpShape{
 				sstr << " " << fill_color.x << " " << fill_color.y << " " << fill_color.z;	
 
 			return sstr.str();
-
 		}
 
 		gpTriangle(int x0, int y0) : gpShape(x0, y0){
@@ -40,7 +38,6 @@ class gpTriangle : public gpShape{
 
 		bool onVertex(int x, int y, bool move = true){
 			int dx, dy;
-			// int diff[2] = {x - mouse_pos[0], y - mouse_pos[1]};
 
 			dx = vertex[0][0] - x;
 			if( (ABS(dx)) <= 8 ){
@@ -120,7 +117,6 @@ class gpTriangle : public gpShape{
 
 				updateSlope(0);
 				updateSlope(1);
-				// updateSlope(2);
             }else{
 				if(n!=2)
 					updateSlope(n);
@@ -231,9 +227,7 @@ class gpTriangle : public gpShape{
 			int area_ABC = areaTimes2( vertex[0][0], vertex[0][1], vertex[1][0], vertex[1][1], vertex[2][0], vertex[2][1] );
 			
 			int area_PBC = areaTimes2( x, y, vertex[1][0], vertex[1][1], vertex[2][0], vertex[2][1] );
-			
 			int area_PAC = areaTimes2( vertex[0][0], vertex[0][1], x, y, vertex[2][0], vertex[2][1] );
-			
 			int area_PAB = areaTimes2( vertex[0][0], vertex[0][1], vertex[1][0], vertex[1][1], x, y );
 
 			area_ABC -= ( ABS(area_PBC) + ABS(area_PAC) + ABS(area_PAB) );
